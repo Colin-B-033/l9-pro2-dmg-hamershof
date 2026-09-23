@@ -5,3 +5,122 @@
 [x-cloak] {
     display: none;
 }
+
+.site-footer {
+    color: #fff;
+    font-family: Georgia, 'Times New Roman', serif;
+}
+
+.site-footer__main {
+    background: #000;
+    padding: 2.5rem 1.5rem 2rem;
+}
+
+.site-footer__container {
+    display: grid;
+    grid-template-columns: minmax(150px, 1fr) minmax(280px, 1.5fr) minmax(220px, 1fr);
+    gap: 3rem;
+    max-width: 1100px;
+    margin: 0 auto;
+    align-items: start;
+}
+
+.site-footer h2 {
+    margin: 0 0 0.75rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid #777;
+    font-size: 1.05rem;
+    font-weight: 400;
+}
+
+.site-footer a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+}
+
+.site-footer a:hover {
+    color: #c9c9c9;
+}
+
+.site-footer__social a {
+    display: inline-block;
+    margin-top: 0.35rem;
+}
+
+.site-footer__link-columns {
+    display: flex;
+    gap: 4rem;
+}
+
+.site-footer ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.site-footer li + li {
+    margin-top: 0.35rem;
+}
+
+.site-footer__links a {
+    text-decoration: none;
+}
+
+.site-footer__brand {
+    align-self: center;
+    justify-self: end;
+    text-align: center;
+}
+
+.site-footer__brand span {
+    display: block;
+    font-size: 2.1rem;
+    line-height: 1;
+}
+
+.site-footer__brand em {
+    font-weight: 400;
+}
+
+.site-footer__brand small {
+    display: block;
+    margin-top: 0.4rem;
+    font-size: 0.8rem;
+    font-style: italic;
+}
+
+.site-footer__legal {
+    max-width: 1100px;
+    margin: 2.5rem auto 0;
+    font-size: 0.85rem;
+}
+
+.site-footer__copyright {
+    padding: 1rem 1.5rem;
+    background: #fff;
+    color: #111;
+    text-align: center;
+    font-family: Arial, sans-serif;
+    font-size: 0.8rem;
+}
+
+.site-footer__copyright a {
+    color: #111;
+}
+
+@media (max-width: 700px) {
+    .site-footer__container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    .site-footer__brand {
+        justify-self: start;
+        text-align: left;
+    }
+
+    .site-footer__link-columns {
+        gap: 2rem;
+    }
+}

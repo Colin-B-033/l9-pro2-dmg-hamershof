@@ -3,7 +3,8 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Inloggen</title>
+	<title>Home</title>
+	@vite('resources/css/app.css')
 </head>
 <body>
 	<main class="login-card">
@@ -18,5 +19,7 @@
 			<button type="submit">Inloggen</button>
 		</form>
 	</main>
+
+	@include('footer')
 </body>
 </html>
