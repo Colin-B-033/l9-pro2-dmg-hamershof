@@ -1,4 +1,12 @@
-Stappen die zij moeten volgen (nadat ze de code hebben gepulled):
+**EERST EXTENSIES DOWNLOADEN**
+Laravel blade snippets
+Laravel Snippets
+Laravel Artisan
+Laravel Extra intellisense
+Laravel Blade formatter
+Laravel goto view
+
+**Stappen die jullie moeten volgen (nada de code is gepulled):**
 
 bash
 composer install
@@ -27,3 +35,5 @@ bash
 php artisan serve
 
 Start de Laravel-server zelf. (In een aparte terminal naast npm run dev.)
+
+**hopelijk werkt het gelijk**
