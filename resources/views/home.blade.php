@@ -7,6 +7,7 @@
 	@vite('resources/css/app.css')
 </head>
 <body>
+	@include('nav')
 	<main class="login-card">
 		<h1>Inloggen</h1>
 
