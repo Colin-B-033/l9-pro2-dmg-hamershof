@@ -8,7 +8,7 @@
 
 :root {
     --home-ink: #171717;
-    --home-paper: #f8f7f3;
+    --home-paper: #ffff;
     --home-accent: #d5c4a1;
 }
 
@@ -30,7 +30,6 @@
 }
 
 .home-hero {
-    min-height: min(720px, 78vh);
     position: relative;
     display: flex;
     align-items: flex-end;
@@ -57,10 +56,9 @@
 }
 
 .home-hero__content {
-    max-width: 1220px;
     padding: clamp(3rem, 9vw, 8rem) 7vw clamp(3.5rem, 9vw, 7rem);
     margin-left: auto;
-    width: min(100%, 430px);
+    width: min(100%, 800px);
 }
 
 .home-hero__eyebrow,
