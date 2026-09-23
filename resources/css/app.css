@@ -9,11 +9,15 @@
 .site-footer {
     color: #fff;
     font-family: Georgia, 'Times New Roman', serif;
+    bottom: 0;
+    position: absolute;
+    
 }
 
 .site-footer__main {
     background: #000;
     padding: 2.5rem 1.5rem 2rem;
+
 }
 
 .site-footer__container {
