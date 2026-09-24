@@ -31,3 +31,6 @@ Route::get('/winkels', function () {
     return view('stores');
 });
 
+Route::get('/events', function () {
+    return view('events');
+});
