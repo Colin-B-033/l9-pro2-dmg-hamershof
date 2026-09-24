@@ -3,6 +3,14 @@
         <div class="site-footer__container">
             <div class="site-footer__social">
                 <h2>Volg ons</h2>
+<source>
+
+    <iframe src="https://www.facebook.com/plugins/page.php?href=https://www.facebook.com/DeHamershof/&amp;tabs=timeline&amp;width=300&amp;height=400&amp;small_header=false&amp;adapt_container_width=true&amp;hide_cover=false&amp;show_facepile=true" 
+    width="100%" height="400" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowfullscreen="true">
+            </iframe>
+            <source>
+
+
             </div>
 
             <nav class="site-footer__links" aria-label="Footer navigatie">

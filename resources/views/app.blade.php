@@ -17,6 +17,7 @@
     </head>
     <body class="font-sans antialiased">
         @include('nav')
+    <body class="site-layout font-sans antialiased">
         @inertia
         @include('footer')
     </body>
