@@ -2,6 +2,7 @@
 		<h1>Inloggen</h1>
 
 		<form method="POST" action="{{ url('/login') }}">
+			@csrf
 			<label for="email">E-mailadres</label>
 			<input type="email" id="email" name="email" value="{{ old('email') }}" required autofocus>
 			<label for="password">Wachtwoord</label>
