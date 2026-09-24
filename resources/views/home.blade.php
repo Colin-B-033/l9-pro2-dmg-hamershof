@@ -130,9 +130,27 @@
 					</div>
 				</article>
 			</div>
-				<section class="home-featured" aria-labelledby="featured-title">
-					<h2 id="featured-title">Uitgelichte Winkels</h2>
-				</section>
+			<section class="home-featured" aria-labelledby="featured-title">
+				<div class="home-section-heading"><h2 id="featured-title">Uitgelichte Winkels</h2></div>
+				<div class="featured-grid">
+					@foreach ([['Mode', 'Fashion District', 'Trendy kleding voor jong en oud', '15:00', 'fashion'], ['Horeca', 'Café Central', 'De beste koffie in de buurt', '18:00', 'cafe'], ['Restaurant', 'Restaurant Plaza', 'Internationale gerechten', '24:00', 'restaurant']] as $place)
+						<article class="place-card place-card--{{ $place[4] }}">
+							<div class="place-card__image"><video autoplay muted loop playsinline aria-hidden="true"><source src="{{ Vite::asset('resources/assets/Home.mp4') }}" type="video/mp4"></video></div>
+							<div class="place-card__body"><span class="place-card__tag">{{ $place[0] }}</span><p class="place-card__hours">OPEN til {{ $place[3] }}</p><h3>{{ $place[1] }}</h3><p>{{ $place[2] }}</p></div>
+						</article>
+					@endforeach
+				</div>
+				<a class="home-button" href="#events">Bekijk Alle Winkels</a>
+			</section>
+		</section>
+
+		<section class="home-events" id="events" aria-labelledby="events-title">
+			<div class="home-section-heading home-section-heading--events"><h2 id="events-title">Evenementen</h2><p>Er is altijd iets te beleven bij Hamershof. Bekijk onze aankomende evenementen en markeer uw agenda.</p></div>
+			<div class="events-grid">
+				@foreach ([['12', 'Lente Fashion Show', 'Bekijk de nieuwste lentetrends tijdens onze exclusieve fashion show met lokale modellen.', '14:00 - 17:00', 'Centrale Plaza', 'fashion'], ['18', 'Kinderactiviteiten Dag', 'Een dag vol pret voor de hele familie met workshops, spelletjes en entertainment.', '10:00 - 16:00', 'Bij de fontein', 'kids'], ['25', 'Food Festival', 'Proef heerlijke gerechten van onze restaurants en ontdek nieuwe smaken.', '12:00 - 20:00', 'Food Court', 'food']] as $event)
+					<article class="event-card"><div class="event-card__image event-card__image--{{ $event[5] }}"><video autoplay muted loop playsinline aria-hidden="true"><source src="{{ Vite::asset('resources/assets/Home.mp4') }}" type="video/mp4"></video><time datetime="2026-03-{{ $event[0] }}"><span>MAART</span>{{ $event[0] }}</time></div><div class="event-card__body"><h3>{{ $event[1] }}</h3><p>{{ $event[2] }}</p><small>◷ &nbsp;{{ $event[3] }}</small><small>⌾ &nbsp;{{ $event[4] }}</small></div></article>
+				@endforeach
+			</div>
 		</section>
 
 	
