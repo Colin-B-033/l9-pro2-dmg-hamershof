@@ -3,9 +3,10 @@
 	@vite('resources/css/app.css')
 </head>
 <body class="home-page site-layout">
-	<main></main>html>
+	<main></main>
 <html lang="nl">
 <head>
+	@include('nav')
 	<meta charset="UTF-8">
 	<meta name="viewport" c
 		<section class="home-hero" aria-labelledby="home-title">
