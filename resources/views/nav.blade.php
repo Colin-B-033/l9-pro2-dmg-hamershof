@@ -24,10 +24,10 @@
 			<a href="/">Home</a>
 			<a href="/te-huur">Te Huur</a>
 			<a href="/plattegrond">Plattegrond</a>
-			<a href="/nieuws">Nieuws</a>
+			<a href="/nieuws">Evenementen</a>
 			<a href="/agenda">Agenda</a>
-			<a href="/markten">Markten</a>
-			<a href="/hamershofbon">Hamershofbon</a>
+			<a href="/markten">Winkels</a>
+			<a href="/hamershofbon">Bezoek ons</a>
 			<a href="/contact">Contact</a>
 		</nav>
 
@@ -36,7 +36,7 @@
 		</a>
 
 		<div class="site-navigation__footer">
-			<span>Volg ons</span>
+			<span>Follow us</span>
 			<a href="https://www.facebook.com/" aria-label="Facebook">f</a>
 			<a href="https://www.instagram.com/" aria-label="Instagram">◎</a>
 			<span class="site-navigation__contact">Contact us<br><a href="mailto:info@hamershof.nl">info@hamershof.nl</a></span>
