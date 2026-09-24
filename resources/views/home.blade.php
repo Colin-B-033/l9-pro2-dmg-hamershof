@@ -140,7 +140,7 @@
 						</article>
 					@endforeach
 				</div>
-				<a class="home-button" href="#events">Bekijk Alle Winkels</a>
+				<a class="home-button" href="{{ url('/winkels') }}">Bekijk Alle Winkels</a>
 			</section>
 		</section>
 

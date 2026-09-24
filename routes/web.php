@@ -27,3 +27,7 @@ Route::get('/home', function () {
     return view('home');
 });
 
+Route::get('/winkels', function () {
+    return view('stores');
+});
+

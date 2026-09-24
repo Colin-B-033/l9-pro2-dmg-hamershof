@@ -602,6 +602,149 @@
     line-height: 1.6;
 }
 
+.stores-page {
+    background: #fff;
+}
+
+.stores-hero {
+    background: #fff;
+    color: #171717;
+    padding: 1.1rem 1rem 0.9rem;
+    text-align: center;
+}
+
+.stores-hero h1 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 80px;
+    font-weight: 400;
+    line-height: 1;
+    margin: 0 0 0.35rem;
+}
+
+.stores-hero > p {
+    color: #6b7074;
+    font-size: 10px;
+    line-height: 1.35;
+    margin: 0 auto;
+    max-width: 24rem;
+}
+
+.stores-filter {
+    align-items: center;
+    background: #fff;
+    border-bottom: 1px solid #deded9;
+    display: flex;
+    gap: 0.45rem;
+    overflow-x: auto;
+    justify-content: center;
+    padding: 0.55rem 1rem;
+    white-space: nowrap;
+}
+
+.stores-filter a {
+    border: 1px solid #d6d8d6;
+    color: #4a4d4d;
+    font-size: 0.48rem;
+    padding: 0.28rem 0.55rem;
+    text-decoration: none;
+}
+
+.stores-filter a:first-child,
+.stores-filter a:hover {
+    background: #111;
+    color: #000;
+    color: #fff;
+    text-decoration: none;
+}
+
+.stores-list {
+    margin: 0 auto;
+    max-width: 1040px;
+    padding: 1.1rem 1rem 3rem;
+}
+
+.stores-list__heading {
+    align-items: baseline;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.7rem;
+}
+
+.stores-list__heading h2 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.58rem;
+    font-weight: 400;
+    margin: 0;
+}
+
+.stores-list__heading span {
+    color: #697070;
+    font-size: 0.48rem;
+}
+
+.stores-grid {
+    display: grid;
+    gap: 0.55rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.store-card {
+    background: #fff;
+    border: 1px solid #c8cac7;
+}
+
+.store-card__image {
+    aspect-ratio: 1.95 / 1;
+    background: #818989;
+    overflow: hidden;
+}
+
+.store-card__image video {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+.store-card__image--mode video { object-position: 15% center; }
+.store-card__image--supermarkten video { object-position: 50% center; }
+.store-card__image--eten video { object-position: 85% center; }
+.store-card__image--diensten video { object-position: 35% center; }
+
+.store-card__body {
+    padding: 0.35rem 0.45rem 0.42rem;
+}
+
+.store-card__body > span {
+    color: #777d7c;
+    font-size: 0.42rem;
+    text-transform: uppercase;
+}
+
+.store-card h3 {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 0.64rem;
+    font-weight: 400;
+    margin: 0.2rem 0 0.3rem;
+}
+
+.store-card p {
+    color: #626a69;
+    font-size: 0.42rem;
+    margin: 0;
+}
+
+.store-card__body a {
+    color: #1e2525;
+    display: inline-block;
+    font-size: 0.46rem;
+    margin-top: 0.55rem;
+    text-decoration: none;
+}
+
+.store-card__body a:hover { text-decoration: underline; }
+
+.store-card__body a span { margin-left: 0.25rem; }
+
 @media (max-width: 700px) {
     .featured-grid,
     .events-grid {
@@ -612,6 +755,32 @@
     .home-events {
         padding-top: 4rem;
     }
+
+    .stores-hero {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .stores-back { margin-bottom: 2rem; }
+
+    .stores-filter {
+        gap: 1.25rem;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .stores-list {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    .stores-list__heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.4rem;
+    }
+
+    .stores-grid { grid-template-columns: 1fr; }
 
     .site-footer__container {
         grid-template-columns: 1fr;
