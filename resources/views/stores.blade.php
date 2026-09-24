@@ -6,6 +6,7 @@
     <title>Alle winkels | De Hamershof</title>
     @vite('resources/css/app.css')
 </head>
+@include('nav')
 <body class="home-page site-layout stores-page">
     <main>
         <section class="stores-hero" aria-labelledby="stores-title">
@@ -57,6 +58,7 @@
                 @endforeach
             </div>
         </section>
+        @include('footer')
     </main>
 
 </body>
