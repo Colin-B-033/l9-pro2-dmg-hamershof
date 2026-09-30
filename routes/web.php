@@ -34,3 +34,7 @@ Route::get('/winkels', function () {
 Route::get('/events', function () {
     return view('events');
 });
+
+Route::get('/bezoekons', function () {
+    return view('bezoekons');
+});

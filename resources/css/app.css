@@ -3,6 +3,7 @@
 @import './home.css';
 @import './login.css';
 @import './stores.css';
+@import './bezoekons.css';
 
 @tailwind base;
 @tailwind components;
