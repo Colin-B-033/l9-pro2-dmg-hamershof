@@ -1,14 +1,14 @@
-<!DOCTYPE ontent="width=device-width, initial-scale=1.0">
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>De Hamershof | Winkelen in Leusden</title>
 	@vite('resources/css/app.css')
 </head>
 <body class="home-page site-layout">
-	<main></main>
-<html lang="nl">
-<head>
 	@include('nav')
-	<meta charset="UTF-8">
-	<meta name="viewport" c
+	<main>
 		<section class="home-hero" aria-labelledby="home-title">
 			<video class="home-hero__video" autoplay muted loop playsinline aria-hidden="true">
 				<source src="{{ Vite::asset('resources/assets/Home.mp4') }}" type="video/mp4">
