@@ -28,3 +28,11 @@ Route::get('/home', function () {
 });
 
 Route::view('/plattegrond', 'plattegrond')->name('plattegrond');
+
+Route::get('/winkels', function () {
+    return view('stores');
+});
+
+Route::get('/events', function () {
+    return view('events');
+});
