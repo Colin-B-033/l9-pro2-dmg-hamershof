@@ -1,0 +1,619 @@
+<!doctype html>
+<html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plattegrond Hamersveld</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#eef0f2;color:#1d2226}
+header{padding:14px 16px}
+header h1{margin:0;font-size:20px}
+header p{margin:4px 0 0;color:#5a646d;font-size:14px}
+.store.active{filter:brightness(1.12)}
+.hl{fill:none;stroke:#111;stroke-width:6;stroke-linejoin:round;pointer-events:none;animation:pulse 1.2s ease-in-out infinite alternate}
+@keyframes pulse{from{stroke-opacity:1}to{stroke-opacity:.35}}
+.tip{position:absolute;z-index:5;pointer-events:none;background:#fff;border-radius:8px;padding:10px 14px;
+     box-shadow:0 6px 20px rgba(0,0,0,.2);min-width:150px;max-width:240px}
+.tip h3{margin:0 0 3px;font-size:15px}.tip p{margin:0;font-size:13px;color:#5a646d}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:20;background:#fff;border-radius:16px 16px 0 0;
+       box-shadow:0 -8px 30px rgba(0,0,0,.2);padding:18px 20px 24px;transform:translateY(110%);
+       transition:transform .25s ease;max-width:560px;margin:0 auto}
+.sheet.open{transform:none}
+.sheet h2{margin:0 0 6px;font-size:19px}.sheet p{margin:0;color:#5a646d}
+.sheet .close{position:absolute;top:10px;right:12px;border:0;background:#eef0f2;border-radius:50%;
+              width:32px;height:32px;font-size:18px;cursor:pointer}
+
+.app{display:grid;grid-template-columns:1fr 320px;gap:16px;padding:0 16px 16px;height:calc(100vh - 78px);min-height:480px}
+.viewer{position:relative;background:#f8f8f8;border-radius:12px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.08);min-height:0}
+.viewer svg{width:100%;height:100%;display:block;touch-action:none;cursor:grab;user-select:none}
+.viewer svg.dragging{cursor:grabbing}
+.controls{position:absolute;right:12px;top:12px;z-index:4;display:flex;flex-direction:column;gap:6px}
+.controls button{width:40px;height:40px;border:0;border-radius:8px;background:#fff;font-size:20px;cursor:pointer;
+                 box-shadow:0 2px 8px rgba(0,0,0,.15)}
+/* Desktop: details-paneel over de onderkant van de kaart, niet over de lijst */
+.viewer .sheet{position:absolute;left:12px;right:auto;bottom:12px;width:min(380px,calc(100% - 24px));margin:0;
+               border-radius:12px;transform:translateY(calc(100% + 24px))}
+.viewer .sheet.open{transform:none}
+aside{background:#fff;border-radius:12px;box-shadow:0 2px 10px rgba(0,0,0,.08);display:flex;flex-direction:column;min-height:0}
+.filters{padding:12px 12px 6px;display:flex;flex-direction:column;gap:8px;border-bottom:1px solid #eef0f2}
+.filters input[type=search]{padding:10px 12px;border:1px solid #cfd5da;border-radius:8px;font:inherit}
+.filters label{font-size:14px;color:#5a646d;display:flex;gap:8px;align-items:center;cursor:pointer}
+.count{font-size:13px;color:#5a646d;padding:6px 14px 0}
+aside ul{list-style:none;margin:0;padding:4px 6px 8px;overflow:auto;flex:1}
+aside li button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:0;background:none;
+                padding:9px 8px;border-radius:6px;font:inherit;cursor:pointer}
+aside li button:hover{background:#f3f5f6}
+aside li button.active{background:#e3e8ec;box-shadow:inset 3px 0 0 #1d2226}
+aside .sw{width:14px;height:14px;border-radius:3px;flex:none}
+aside .n{font-weight:600;min-width:34px}
+aside small{color:#5a646d}
+.empty{padding:16px;color:#5a646d;font-size:14px}
+@media (max-width:1000px){
+  .app{grid-template-columns:1fr;height:auto;padding:0 8px 8px;gap:8px}
+  .viewer{height:60vh}
+  aside ul{max-height:60vh}
+  .viewer .sheet{position:fixed;left:0;right:0;bottom:0;width:auto;margin:0 auto;max-width:560px;
+                 border-radius:16px 16px 0 0;transform:translateY(110%)}
+}
+</style></head><body>
+<header><h1>Plattegrond</h1><p>Scroll of knijp om te zoomen, sleep om te pannen, of kies een winkel in de lijst.</p></header>
+<div class="app">
+<div class="viewer">
+<svg id="map" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 1427" font-family="Myriad Pro, Segoe UI, Helvetica, Arial, sans-serif">
+<style>
+  .road{fill:#b0b8c0}.outline{fill:#505860}.water{fill:#0080c0}
+  .store{stroke:#505860;stroke-width:4;stroke-linejoin:round;cursor:pointer;transition:filter .15s}
+  .store:hover,.store:focus{filter:brightness(1.12) drop-shadow(0 0 6px rgba(0,0,0,.35));outline:none}
+  .building{fill:#505860}
+  .num{fill:#fff;font-size:17px;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+  .num.dark{fill:#222}
+  .street{fill:#fff;font-size:17px;text-anchor:middle;dominant-baseline:central;letter-spacing:.5px;pointer-events:none}
+  .lbl{fill:#222;font-size:17px;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+  .picon rect{fill:#0098d0}.picon text{fill:#fff;font-weight:700;font-size:30px;text-anchor:middle;dominant-baseline:central}
+</style>
+<rect width="2000" height="1427" fill="#f8f8f8"/>
+<path class="road" fill-rule="evenodd" d="M1452,251 1454,252 1454,525 1451,526 1451,602 1378,603 1585,603 1454,602 1455,254 1772,254 1773,550 1776,553 1775,251ZM805,251 805,374 805,369 808,368 809,253 1233,253 1234,382 1237,384 1236,250ZM74,174 77,175 77,217 224,218 224,232 220,233 220,411 111,412 110,415 107,415 219,415 220,436 55,437 58,438 58,502 220,503 220,658 48,659 48,699 177,699 178,776 178,700 224,700 224,776 220,777 220,894 224,895 234,919 246,938 283,980 400,1065 400,1069 600,1069 601,1065 813,1065 814,1124 815,1069 891,1069 892,1065 993,1065 993,1311 948,1311 994,1310 995,1069 1093,1069 1094,1065 1120,1065 1121,1069 1349,1069 1351,1064 1476,1025 1487,1025 1511,1071 1521,1097 1551,1258 1551,1269 1549,1271 1388,1325 1303,1341 648,1341 601,1336 578,1329 547,1310 195,1007 170,981 132,960 123,957 109,957 109,1018 116,1016 129,1017 141,1021 154,1029 177,1051 535,1349 546,1356 586,1372 613,1378 637,1380 638,1384 1303,1384 1304,1380 1329,1378 1411,1360 1985,1162 1982,1122 1593,1256 1583,1255 1570,1171 1571,1157 1768,1090 1789,1059 1803,1028 1820,965 1827,900 1827,218 1917,217 1918,221 1917,174ZM263,462 292,438 332,400 360,369 389,332 425,272 435,249 445,217 1787,217 1788,895 1780,967 1772,1002 1762,1028 1762,1041 1755,1043 1746,1055 1571,1116 1563,1116 1550,1069 1536,1039 1515,1006 1495,982 1343,1025 1251,1027 1250,810 1249,1028 1225,1028 1224,1030 1056,1030 1054,1025 914,1025 913,1029 706,1029 705,1025 411,1025 302,945 269,908 270,630 263,629ZM401,217 402,226 386,266 354,320 329,351 306,374 276,398 264,400 263,218Z"/>
+<path class="outline" fill-rule="evenodd" d="M1800,1092 1795,1092 1751,1108 1757,1137 1759,1138 1758,1142 1766,1181 1768,1184 1754,1114 1751,1109ZM1857,1071 1804,1089 1803,1091 1805,1089 1806,1090 1856,1073 1872,1147 1772,1182 1771,1184 1873,1148ZM1483,1054 1459,1042 1348,1078 1348,1082 1358,1104 1336,1114 1332,1112 1320,1084 1205,1084 1204,1290 1195,1288 1195,1097 1028,1097 1028,1336 1195,1336 1196,1290 1320,1290 1409,1280 1519,1256 1542,1249 1517,1255 1514,1254ZM1031,1099 1194,1100 1193,1334 1030,1333ZM1482,1056 1512,1240 1512,1256 1418,1278 1326,1289 1207,1288 1206,1087 1209,1084 1316,1084 1320,1086 1332,1114 1336,1115 1359,1105 1357,1097 1349,1081 1354,1077 1459,1043ZM1411,853 1397,856 1384,863 1375,871 1364,891 1362,900 1362,914 1368,933 1381,949 1400,959 1419,961 1429,959 1443,953 1457,940 1464,927 1467,917 1467,897 1459,877 1447,864 1429,855ZM1401,856 1425,855 1442,862 1456,875 1466,897 1466,916 1460,933 1445,950 1429,958 1412,960 1400,958 1389,953 1375,941 1369,932 1364,919 1363,901 1369,882 1381,867 1393,859ZM90,830 90,843 91,838 168,838 168,836 91,836ZM1013,476 1013,585 1027,586 1027,656 1088,656 1089,677 1234,677 1234,583 1062,583 1061,464 1026,464ZM1206,626 1230,625 1233,627 1234,642 1232,676 1205,675ZM1201,625 1204,627 1204,675 1184,676 1182,674 1182,627ZM1161,625 1178,625 1182,629 1182,673 1180,676 1159,675 1158,629ZM1127,626 1151,625 1158,628 1158,674 1156,676 1127,676 1125,674 1125,628ZM1092,626 1118,625 1124,627 1125,673 1123,676 1090,675 1090,628ZM1048,627 1050,625 1088,626 1090,629 1089,653 1049,654 1047,651ZM1090,598 1232,597 1233,624 1092,625 1090,623ZM1090,586 1232,585 1233,595 1092,596 1090,594ZM1028,586 1088,585 1090,587 1089,623 1087,625 1047,625 1047,652 1045,654 1029,654ZM1028,465 1060,466 1060,582 1057,584 1016,584 1014,582 1013,481 1015,476ZM806,251 806,373 906,373 908,375 908,453 956,453 956,338 931,337 931,285 824,285 824,371 808,372 808,252 1235,253 1234,383 1058,382 1059,374 1220,374 1220,285 1106,285 1105,303 1010,303 1010,453 1058,453 1059,385 1236,385 1236,251ZM1011,424 1056,423 1057,450 1055,452 1012,452 1010,449ZM1013,373 1054,373 1057,376 1057,420 1055,422 1013,422 1011,420 1011,375ZM910,373 955,374 954,452 909,451 908,407 953,406 909,405ZM932,339 955,340 954,372 931,371ZM1011,306 1105,305 1106,371 1104,373 1012,373ZM825,287 929,286 930,371 826,372ZM1216,285 1219,287 1219,371 1217,373 1176,373 1173,371 1173,288 1175,286ZM1170,285 1172,287 1172,372 1108,373 1107,287ZM1401,244 1289,244 1289,552 1254,553 1254,673 1315,673 1315,602 1349,601 1349,499 1351,497 1398,497 1398,467 1401,466ZM1396,385 1397,495 1348,497 1348,599 1314,601 1314,670 1312,672 1256,672 1255,556 1257,554 1298,554 1299,518 1319,516 1319,386 1325,384ZM1398,246 1399,382 1318,383 1318,515 1298,516 1298,552 1291,553 1290,247ZM74,175 74,220 221,221 220,230 108,230 108,414 220,414 221,437 55,438 55,505 221,506 221,655 45,656 45,702 178,702 179,776 219,776 219,703 221,703 221,897 226,910 237,930 249,947 282,983 399,1068 601,1069 600,1067 401,1067 282,981 260,958 245,939 230,915 222,895 222,221 264,221 264,401 267,402 305,373 328,350 353,319 374,286 389,256 402,219 77,219 77,176 1915,176 1915,219 445,219 435,253 420,285 403,314 382,344 344,389 305,428 264,464 264,896 271,905 271,908 303,944 412,1024 706,1024 707,1028 912,1028 913,1024 1055,1024 1056,1028 1224,1028 1251,1027 1252,1025 1341,1024 1466,988 1496,981 1513,1001 1532,1029 1547,1058 1557,1085 1563,1109 1585,1251 1584,1256 1551,1267 1519,1096 1507,1066 1485,1024 1349,1067 604,1067 604,1069 649,1068 651,1070 651,1150 649,1152 602,1153 602,1301 806,1301 807,1285 831,1285 832,1302 891,1302 891,1126 814,1126 814,1068 892,1068 893,1129 894,1069 948,1069 948,1310 993,1310 994,1068 1350,1068 1483,1026 1488,1032 1504,1063 1518,1097 1539,1212 1543,1223 1542,1228 1545,1243 1547,1245 1546,1248 1549,1265 1546,1269 1397,1320 1302,1338 650,1338 612,1335 579,1326 553,1311 196,1004 176,982 161,971 140,960 123,954 106,954 106,1022 116,1019 129,1020 138,1023 153,1032 170,1049 534,1352 555,1364 579,1373 607,1380 630,1383 1323,1382 1415,1362 1988,1164 1985,1121 1982,1119 1590,1254 1586,1253 1575,1184 1576,1177 1588,1247 1695,1210 1698,1208 1682,1131 1576,1167 1575,1178 1572,1164 1573,1160 1771,1092 1789,1065 1800,1043 1810,1017 1823,965 1830,900 1830,221 1917,220 1917,175ZM1681,1133 1697,1207 1589,1245 1576,1169ZM651,1073 653,1071 811,1071 812,1127 888,1127 890,1131 890,1298 887,1301 836,1301 833,1299 832,1284 806,1284 805,1298 802,1300 605,1300 603,1298 603,1154 651,1153ZM989,1067 992,1069 992,1308 988,1310 951,1309 949,1307 949,1070 951,1068ZM1750,1045 1745,1052 1582,1109 1575,1109 1573,1100 1576,1098 1743,1045ZM783,956 853,955 854,1025 784,1026ZM708,957 710,955 780,955 781,1025 709,1026ZM107,956 121,955 131,958 153,968 171,980 196,1006 552,1312 582,1329 604,1335 626,1338 1304,1339 1398,1321 1980,1121 1984,1124 1987,1162 1410,1362 1321,1381 623,1381 584,1373 554,1362 538,1353 175,1051 153,1030 131,1019 114,1018 108,1020ZM1141,950 1145,948 1222,949 1223,1025 1221,1027 1143,1027 1141,1025ZM1057,950 1060,948 1138,948 1141,951 1140,1026 1059,1027 1057,1025ZM603,950 605,948 656,948 658,950 658,975 604,976ZM603,919 657,918 658,946 604,947ZM857,907 911,908 910,1026 855,1025 855,909ZM1255,880 1309,880 1312,882 1312,911 1306,913 1312,914 1312,943 1310,945 1305,945 1310,945 1312,947 1311,1024 1260,1025 1253,1024 1251,1022 1251,948 1254,945 1251,942 1251,915 1253,913 1303,913 1253,912 1251,910 1251,883ZM604,856 656,856 658,858 657,916 603,915ZM856,842 911,843 910,906 855,905ZM1544,834 1554,878 1523,888 1520,882 1512,843ZM603,826 656,825 658,827 658,853 656,855 604,855ZM1076,808 1251,809 1250,1025 1224,1024 1224,948 1074,947 1074,810ZM1678,796 1681,800 1709,891 1712,892 1751,878 1755,880 1760,1038 1756,1041 1662,1071 1653,1072 1637,1079 1570,1099 1566,1091 1560,1063 1563,1059 1561,1059 1558,1054 1546,1000 1548,995 1544,992 1535,948 1539,946 1536,947 1533,942 1522,890 1529,886 1555,880 1545,836 1547,832ZM855,795 910,794 911,839 856,840ZM854,795 854,953 707,954 706,1022 412,1022 303,942 281,917 285,917 418,1007 420,977 659,977 660,794ZM603,795 657,794 658,823 604,824ZM615,740 672,739 673,792 617,793 615,791ZM272,738 274,736 320,736 323,740 326,736 376,736 380,738 381,743 382,742 406,764 433,779 455,787 456,790 461,789 489,798 517,804 554,809 557,812 557,974 554,977 418,977 419,1000 416,1004 275,910 271,904 271,827 274,823 440,823 447,809 439,823 382,823 380,821 377,823 326,823 323,820 321,823 275,823 272,821 271,814ZM1075,728 1116,727 1118,729 1120,727 1147,727 1149,731 1150,727 1198,727 1200,729 1200,742 1200,729 1202,727 1226,727 1228,730 1230,727 1311,727 1312,813 1310,815 1296,815 1310,815 1312,817 1312,846 1309,848 1256,848 1310,848 1312,850 1312,878 1310,880 1253,880 1251,878 1251,850 1254,848 1251,845 1251,818 1253,815 1263,815 1253,815 1251,813 1251,806 1249,808 1230,808 1228,806 1228,800 1228,806 1225,808 1202,808 1200,805 1197,808 1151,808 1149,806 1149,735 1148,807 1120,808 1117,806 1115,808 1076,808 1074,805ZM1030,727 1072,727 1074,729 1074,821 1072,823 1053,823 1072,823 1074,825 1074,846 1072,848 1074,850 1074,871 1072,874 1051,874 1072,874 1074,876 1074,901 1071,902 1074,904 1074,946 1072,948 1030,948 1028,946 1028,904 1030,903 1028,901 1028,876 1030,874 1028,872 1028,825 1030,823 1028,821 1028,729ZM856,727 911,728 910,793 855,792ZM821,727 854,728 853,793 820,792ZM784,727 819,728 818,793 783,792ZM708,728 780,727 781,792 709,793ZM675,727 706,728 705,793 674,792ZM181,705 218,706 217,774 180,773ZM47,659 220,658 221,699 219,701 48,701ZM400,632 426,633 425,699 399,698ZM358,632 398,633 397,699 357,698ZM330,632 355,633 356,696 354,699 329,698ZM273,632 328,633 327,699 272,698ZM508,661 494,672 471,684 433,696 427,695 427,647 453,646 469,628ZM486,609 526,643 524,647 510,660 471,627ZM1378,607 1381,604 1583,605 1584,739 1494,740 1583,741 1584,758 1580,760 1584,761 1584,793 1504,817 1501,813 1497,787 1499,782 1496,779 1492,756 1492,740 1380,740 1378,737ZM272,604 327,603 328,630 274,631 272,629ZM858,593 877,594 876,656 856,655 856,595ZM798,593 855,594 854,677 796,676 796,595ZM767,593 795,594 794,677 766,676ZM713,593 765,594 764,677 711,676 711,595ZM591,595 593,593 709,593 710,676 592,677ZM272,573 277,571 327,572 328,601 274,602 272,600ZM954,569 955,589 933,591 933,655 879,656 878,594 908,569ZM561,565 562,567 558,585 550,607 540,626 528,642 488,608 509,584 511,565ZM592,536 644,537 643,592 591,591ZM272,525 274,523 327,523 328,569 273,570ZM329,521 355,520 357,522 357,542 508,542 509,581 452,645 428,645 427,631 330,631ZM511,487 561,488 561,538 564,541 564,555 561,564 510,563ZM417,488 508,487 509,539 418,540ZM358,488 415,487 416,539 359,541ZM591,486 643,485 644,534 593,535 591,533ZM910,467 938,467 955,480 954,567 909,566ZM56,440 220,439 221,503 57,504ZM591,437 593,435 643,435 644,483 593,484 591,482ZM591,397 643,396 644,433 592,434ZM647,346 764,347 764,469 732,512 731,592 646,591ZM591,347 643,346 644,394 593,395 591,393ZM726,285 764,286 763,344 725,343ZM646,286 723,285 724,343 647,344ZM593,285 645,286 644,344 591,343 591,287ZM1453,254 1773,253 1774,550 1666,551 1665,511 1587,511 1586,542 1454,542ZM395,231 396,234 377,277 345,327 308,368 286,387 267,400 266,232ZM110,231 221,232 220,413 109,412ZM1827,220 1829,892 1825,944 1814,999 1798,1044 1782,1074 1769,1091 1573,1159 1571,1157 1565,1119 1567,1115 1744,1054 1749,1050 1754,1042 1761,1040 1760,1029 1770,1003 1778,969 1786,900 1786,222 1788,220ZM266,464 302,433 338,398 369,363 390,336 410,306 427,275 439,247 447,220 1784,220 1785,895 1782,933 1777,967 1764,1017 1761,1022 1759,1003 1756,876 1713,891 1710,890 1680,795 1593,819 1590,818 1585,796 1585,604 1454,604 1453,544 1588,543 1589,513 1663,513 1664,553 1775,553 1775,252 1452,252 1452,603 1377,604 1377,741 1489,741 1502,818 1580,795 1584,796 1589,818 1588,820 1510,841 1568,1101 1571,1100 1573,1102 1574,1111 1567,1114 1564,1113 1559,1087 1541,1042 1520,1008 1496,979 1343,1022 1313,1021 1313,726 1027,726 1027,949 1056,950 1055,1022 912,1021 912,725 673,725 672,738 614,738 614,791 602,792 601,976 558,975 558,809 497,799 464,790 440,781 421,772 401,759 387,746 380,736 272,735 273,700 427,700 428,697 443,695 477,683 492,675 513,660 528,645 542,626 551,609 559,587 564,564 566,543 565,519 563,518 564,486 590,487 590,678 856,678 857,658 935,658 934,593 956,592 956,479 939,466 908,466 908,567 878,592 733,591 733,513 765,470 765,284 590,284 589,485 357,485 356,519 274,519 274,521 271,522 270,900 266,895ZM266,229 267,220 400,221 397,230Z"/>
+<path class="water" d="M953,1072 953,1307 990,1307 990,1072Z"/>
+<g id="buildings">
+  <polygon class="building" points="85,36 85,153 202,153 202,36"/>
+  <polygon class="building" points="702,153 819,153 819,70 915,69 915,36 702,36"/>
+  <polygon class="building" points="1036,36 1228,36 1228,154 1036,154"/>
+  <polygon class="building" points="1286,36 1491,36 1491,154 1286,154"/>
+  <polygon class="building" points="1606,36 1606,153 1810,153 1810,36"/>
+  <polygon class="building" points="1843,36 1843,108 1929,108 1929,36"/>
+  <polygon class="building" points="1839,311 1839,437 1867,437 1867,383 1869,382 1892,404 1892,478 1981,478 1981,361 1901,361 1867,335 1867,311"/>
+  <polygon class="building" points="1866,563 1866,823 1980,823 1980,563"/>
+  <polygon class="building" points="1863,924 1978,924 1978,1118 1863,1118"/>
+</g>
+<g id="stores">
+  <polygon class="store" data-id="1" tabindex="0" aria-label="Unit 1" fill="#f8a890" points="276,528 276,569 327,569 326,527"/>
+  <polygon class="store" data-id="2A" tabindex="0" aria-label="Unit 2A" fill="#f8a890" points="276,575 276,600 327,599 326,575"/>
+  <polygon class="store" data-id="2B" tabindex="0" aria-label="Unit 2B" fill="#f8a890" points="275,606 328,606 328,630 275,630"/>
+  <polygon class="store" data-id="3" tabindex="0" aria-label="Unit 3" fill="#f8a890" points="276,636 276,697 327,697 327,636"/>
+  <polygon class="store" data-id="4" tabindex="0" aria-label="Unit 4" fill="#f8a890" points="333,635 355,635 355,698 333,698"/>
+  <polygon class="store" data-id="5" tabindex="0" aria-label="Unit 5" fill="#f8a890" points="360,635 360,698 395,698 396,636"/>
+  <polygon class="store" data-id="6" tabindex="0" aria-label="Unit 6" fill="#f8a890" points="402,635 425,635 425,699 402,699"/>
+  <polygon class="store" data-id="7" tabindex="0" aria-label="Unit 7" fill="#f8a890" points="505,659 501,659 472,633 453,650 430,650 430,695 453,691 458,687 478,681 497,668 501,668 499,666 505,663"/>
+  <polygon class="store" data-id="8" tabindex="0" aria-label="Unit 8" fill="#f8a890" points="486,615 478,623 476,629 511,658 524,644 490,615"/>
+  <polygon class="store" data-id="9" tabindex="0" aria-label="Unit 9" fill="#f8a890" points="559,569 514,569 512,587 505,592 492,609 529,639 548,609 558,584"/>
+  <polygon class="store" data-id="10" tabindex="0" aria-label="Unit 10" fill="#f8a890" points="514,490 564,490 564,563 514,563"/>
+  <polygon class="store" data-id="11" tabindex="0" aria-label="Unit 11" fill="#f8a890" points="420,490 420,539 507,539 507,490"/>
+  <polygon class="store" data-id="12" tabindex="0" aria-label="Unit 12" fill="#0080c0" points="383,748 383,821 439,822 454,791 415,773"/>
+  <polygon class="store" data-id="13" tabindex="0" aria-label="Unit 13" fill="#0080c0" points="556,815 551,812 514,807 459,793 442,827 276,827 275,906 415,1001 419,975 555,975"/>
+  <polygon class="store" data-id="14" tabindex="0" aria-label="Unit 14" fill="#0080c0" points="327,740 327,821 377,822 378,740"/>
+  <polygon class="store" data-id="15" tabindex="0" aria-label="Unit 15" fill="#0080c0" points="276,740 275,821 321,822 322,741"/>
+  <polygon class="store" data-id="19" tabindex="0" aria-label="Unit 19" fill="#f8c8a0" points="606,951 606,975 657,975 656,951"/>
+  <polygon class="store" data-id="20" tabindex="0" aria-label="Unit 20" fill="#f8c8a0" points="606,921 607,946 657,945 656,921"/>
+  <polygon class="store" data-id="21" tabindex="0" aria-label="Unit 21" fill="#f8c8a0" points="607,859 606,915 656,916 657,860"/>
+  <polygon class="store" data-id="23" tabindex="0" aria-label="Unit 23" fill="#f8c8a0" points="606,829 607,854 657,853 656,828"/>
+  <polygon class="store" data-id="24" tabindex="0" aria-label="Unit 24" fill="#f8c8a0" points="606,797 606,823 657,823 656,797"/>
+  <polygon class="store" data-id="25" tabindex="0" aria-label="Unit 25" fill="#f8c8a0" points="618,743 619,792 672,792 672,742"/>
+  <polygon class="store" data-id="26" tabindex="0" aria-label="Unit 26" fill="#f8c8a0" points="678,729 677,792 706,792 706,729"/>
+  <polygon class="store" data-id="27" tabindex="0" aria-label="Unit 27" fill="#f8c8a0" points="711,729 711,792 780,792 780,729"/>
+  <polygon class="store" data-id="29" tabindex="0" aria-label="Unit 29" fill="#f8c8a0" points="785,729 785,791 818,792 818,730"/>
+  <polygon class="store" data-id="30" tabindex="0" aria-label="Unit 30" fill="#f8c8a0" points="824,729 823,792 853,792 853,729"/>
+  <polygon class="store" data-id="31" tabindex="0" aria-label="Unit 31" fill="#f8c8a0" points="859,729 858,791 910,792 910,729"/>
+  <polygon class="store" data-id="32" tabindex="0" aria-label="Unit 32" fill="#f8c8a0" points="858,798 859,840 911,840 910,797"/>
+  <polygon class="store" data-id="33" tabindex="0" aria-label="Unit 33" fill="#f8c8a0" points="858,845 858,904 910,905 911,844"/>
+  <polygon class="store" data-id="34" tabindex="0" aria-label="Unit 34" fill="#f8c8a0" points="859,910 858,1025 910,1026 910,911"/>
+  <polygon class="store" data-id="35" tabindex="0" aria-label="Unit 35" fill="#f8c8a0" points="786,958 785,1026 853,1026 853,959"/>
+  <polygon class="store" data-id="36" tabindex="0" aria-label="Unit 36" fill="#f8c8a0" points="711,959 712,1026 781,1026 779,958"/>
+  <polygon class="store" data-id="37a" tabindex="0" aria-label="Unit 37a" fill="#00a0a8" points="1061,952 1061,1025 1139,1025 1139,952"/>
+  <polygon class="store" data-id="37b" tabindex="0" aria-label="Unit 37b" fill="#00a0a8" points="1145,952 1145,1025 1221,1025 1221,952"/>
+  <polygon class="store" data-id="38" tabindex="0" aria-label="Unit 38" fill="#00a0a8" points="1032,906 1032,946 1072,946 1072,907"/>
+  <polygon class="store" data-id="39" tabindex="0" aria-label="Unit 39" fill="#00a0a8" points="1032,878 1032,901 1072,900 1072,878"/>
+  <polygon class="store" data-id="40" tabindex="0" aria-label="Unit 40" fill="#00a0a8" points="1032,851 1073,851 1073,873 1032,873"/>
+  <polygon class="store" data-id="41" tabindex="0" aria-label="Unit 41" fill="#00a0a8" points="1032,827 1032,846 1072,845 1071,827"/>
+  <polygon class="store" data-id="42" tabindex="0" aria-label="Unit 42" fill="#00a0a8" points="1032,731 1032,821 1071,822 1072,732"/>
+  <polygon class="store" data-id="43" tabindex="0" aria-label="Unit 43" fill="#00a0a8" points="1078,731 1078,806 1115,806 1116,732"/>
+  <polygon class="store" data-id="44" tabindex="0" aria-label="Unit 44" fill="#00a0a8" points="1122,731 1121,805 1147,806 1147,731"/>
+  <polygon class="store" data-id="45" tabindex="0" aria-label="Unit 45" fill="#00a0a8" points="1153,731 1153,805 1197,806 1198,732"/>
+  <polygon class="store" data-id="47" tabindex="0" aria-label="Unit 47" fill="#00a0a8" points="1204,731 1204,806 1225,806 1226,732"/>
+  <polygon class="store" data-id="48" tabindex="0" aria-label="Unit 48" fill="#00a0a8" points="1231,731 1251,731 1251,807 1231,807"/>
+  <polygon class="store" data-id="49" tabindex="0" aria-label="Unit 49" fill="#00a0a8" points="1256,731 1255,813 1310,813 1310,731"/>
+  <polygon class="store" data-id="50" tabindex="0" aria-label="Unit 50" fill="#00a0a8" points="1255,820 1256,846 1310,845 1309,819"/>
+  <polygon class="store" data-id="51" tabindex="0" aria-label="Unit 51" fill="#00a0a8" points="1310,852 1255,852 1255,878 1310,878"/>
+  <polygon class="store" data-id="52" tabindex="0" aria-label="Unit 52" fill="#00a0a8" points="1255,885 1256,911 1310,911 1310,884"/>
+  <polygon class="store" data-id="53" tabindex="0" aria-label="Unit 53" fill="#00a0a8" points="1255,918 1255,943 1310,943 1310,917"/>
+  <polygon class="store" data-id="54" tabindex="0" aria-label="Unit 54" fill="#00a0a8" points="1256,949 1255,1022 1309,1023 1310,950"/>
+  <polygon class="store" data-id="55" tabindex="0" aria-label="Unit 55" fill="#b01878" points="1409,858 1390,865 1376,878 1367,898 1367,918 1376,938 1391,952 1408,958 1425,958 1446,948 1457,936 1464,920 1464,896 1456,879 1443,866 1428,859"/>
+  <polygon class="store" data-id="56" tabindex="0" aria-label="Unit 56" fill="#0098d0" points="1644,1040 1566,1062 1565,1069 1572,1097 1651,1072"/>
+  <polygon class="store" data-id="57" tabindex="0" aria-label="Unit 57" fill="#0098d0" points="1578,992 1550,999 1563,1057 1591,1049"/>
+  <polygon class="store" data-id="58" tabindex="0" aria-label="Unit 58" fill="#0098d0" points="1567,942 1539,951 1548,993 1577,985"/>
+  <polygon class="store" data-id="59" tabindex="0" aria-label="Unit 59" fill="#0098d0" points="1554,884 1526,892 1537,944 1565,937"/>
+  <polygon class="store" data-id="60" tabindex="0" aria-label="Unit 60" fill="#0098d0" points="1678,800 1549,836 1596,1046 1646,1033 1658,1070 1758,1038 1755,884 1749,883 1713,896 1708,895"/>
+  <polygon class="store" data-id="61" tabindex="0" aria-label="Unit 61" fill="#0098d0" points="1582,764 1502,785 1505,815 1581,793"/>
+  <polygon class="store" data-id="62" tabindex="0" aria-label="Unit 62" fill="#0098d0" points="1495,744 1500,780 1582,758 1582,744"/>
+  <polygon class="store" data-id="63" tabindex="0" aria-label="Unit 63" fill="#0098d0" points="1382,608 1382,738 1582,738 1581,608"/>
+  <polygon class="store" data-id="64" tabindex="0" aria-label="64 · Bibliotheek" fill="#e08850" points="1396,388 1323,388 1323,517 1321,520 1302,521 1302,555 1300,557 1259,558 1259,671 1312,671 1312,601 1315,599 1347,599 1347,497 1349,495 1396,494"/>
+  <polygon class="store" data-id="65" tabindex="0" aria-label="Unit 65" fill="#e08850" points="1209,629 1208,674 1231,675 1232,630"/>
+  <polygon class="store" data-id="66" tabindex="0" aria-label="Unit 66" fill="#e08850" points="1185,629 1204,629 1204,676 1185,676"/>
+  <polygon class="store" data-id="67" tabindex="0" aria-label="Unit 67" fill="#e08850" points="1162,629 1162,675 1179,675 1180,630"/>
+  <polygon class="store" data-id="68" tabindex="0" aria-label="Unit 68" fill="#e08850" points="1129,629 1157,629 1157,676 1129,676"/>
+  <polygon class="store" data-id="69" tabindex="0" aria-label="Unit 69" fill="#e08850" points="1094,629 1094,675 1123,675 1123,629"/>
+  <polygon class="store" data-id="70" tabindex="0" aria-label="Unit 70" fill="#e08850" points="1050,628 1050,654 1089,654 1089,628"/>
+  <polygon class="store" data-id="71" tabindex="0" aria-label="Unit 71" fill="#e08850" points="1088,588 1031,588 1032,653 1046,652 1047,624 1088,623"/>
+  <polygon class="store" data-id="72" tabindex="0" aria-label="Unit 72" fill="#e08850" points="1017,468 1059,468 1059,583 1017,583"/>
+  <polygon class="store" data-id="73" tabindex="0" aria-label="Unit 73" fill="#e08850" points="1014,426 1014,451 1055,451 1056,426"/>
+  <polygon class="store" data-id="74" tabindex="0" aria-label="Unit 74" fill="#e08850" points="1014,377 1014,420 1055,420 1056,378"/>
+  <polygon class="store" data-id="75" tabindex="0" aria-label="Unit 75" fill="#e08850" points="1014,308 1014,371 1104,371 1103,307"/>
+  <polygon class="store" data-id="76" tabindex="0" aria-label="Unit 76" fill="#e08850" points="1110,289 1110,371 1171,372 1171,289"/>
+  <polygon class="store" data-id="77" tabindex="0" aria-label="Unit 77" fill="#e08850" points="1178,289 1177,371 1217,372 1218,290"/>
+  <polygon class="store" data-id="78" tabindex="0" aria-label="Unit 78" fill="#f8e0a0" points="911,469 955,469 955,568 911,568"/>
+  <polygon class="store" data-id="79" tabindex="0" aria-label="Unit 79" fill="#f8e0a0" points="955,571 909,571 881,595 882,656 932,656 932,591 955,590"/>
+  <polygon class="store" data-id="80" tabindex="0" aria-label="Unit 80" fill="#f8e0a0" points="859,596 877,596 877,657 859,657"/>
+  <polygon class="store" data-id="81" tabindex="0" aria-label="Unit 81" fill="#f8e0a0" points="800,596 799,676 853,676 854,597"/>
+  <polygon class="store" data-id="82" tabindex="0" aria-label="Unit 82" fill="#f8e0a0" points="770,596 769,676 794,676 794,597"/>
+  <polygon class="store" data-id="83" tabindex="0" aria-label="Unit 83" fill="#f8e0a0" points="714,597 714,676 764,676 764,597"/>
+  <polygon class="store" data-id="85" tabindex="0" aria-label="Unit 85" fill="#f8e0a0" points="594,597 595,676 709,676 708,596"/>
+  <polygon class="store" data-id="87a" tabindex="0" aria-label="Unit 87a" fill="#f8e0a0" points="594,489 595,534 644,533 644,488"/>
+  <polygon class="store" data-id="87b" tabindex="0" aria-label="Unit 87b" fill="#f8e0a0" points="595,539 594,591 644,591 644,540"/>
+  <polygon class="store" data-id="88" tabindex="0" aria-label="Unit 88" fill="#f8e0a0" points="594,439 595,483 644,482 643,438"/>
+  <polygon class="store" data-id="89" tabindex="0" aria-label="Unit 89" fill="#f8e0a0" points="594,400 595,433 644,434 643,399"/>
+  <polygon class="store" data-id="90-2" tabindex="0" aria-label="Unit 90" fill="#f8e0a0" points="644,348 595,349 594,393 643,394"/>
+  <polygon class="store" data-id="91" tabindex="0" aria-label="Unit 91" fill="#f8e0a0" points="595,288 594,343 643,344 644,288"/>
+  <polygon class="store" data-id="90" tabindex="0" aria-label="Unit 90" fill="#f8e0a0" points="649,288 649,344 723,344 723,288"/>
+  <polygon class="store" data-id="94" tabindex="0" aria-label="Unit 94" fill="#f8e0a0" points="729,288 728,343 762,344 763,288"/>
+  <polygon class="store" data-id="95" tabindex="0" aria-label="Unit 95" fill="#f8e0a0" points="828,290 829,371 929,370 928,289"/>
+  <polygon class="store" data-id="96" tabindex="0" aria-label="Unit 96" fill="#f8e0a0" points="933,341 956,341 956,373 933,373"/>
+  <polygon class="store" data-id="97" tabindex="0" aria-label="Unit 97" fill="#f8e0a0" points="912,377 912,404 954,404 953,376"/>
+  <polygon class="store" data-id="98" tabindex="0" aria-label="Unit 98" fill="#f8e0a0" points="912,409 912,451 954,451 954,409"/>
+  <polygon class="store" data-id="110" tabindex="0" aria-label="110 · Gemeentehuis" fill="#e84050" points="1210,1048 1512,1048 1512,1288 1210,1288"/>
+  <polygon class="store" data-id="111" tabindex="0" aria-label="111 · Sporthal De Korf" fill="#209098" points="605,1074 890,1074 890,1301 605,1301"/>
+  <polygon class="store" data-id="112" tabindex="0" aria-label="Unit 112" fill="#209098" points="606,1071 606,1151 650,1151 650,1072"/>
+  <polygon class="store" data-id="113" tabindex="0" aria-label="Unit 113" fill="#e08850" points="1591,440 1591,499 1664,499 1663,439"/>
+  <polygon class="store" data-id="brandweer" tabindex="0" aria-label="Brandweer" fill="#e81860" points="61,1240 61,1243 202,1363 386,1362 385,1294 226,1294 101,1190"/>
+</g>
+<polygon class="store" data-id="11-west" tabindex="0" aria-label="Unit (geen nummer)" fill="#f8a890" points="361,490 362,539 414,538 414,490"/>
+<g id="numbers">
+  <text class="num" x="144" y="94">99</text>
+  <text class="num" x="781" y="87">100</text>
+  <text class="num" x="1067" y="91">101</text><text class="num" x="1149" y="91">102</text>
+  <text class="num" x="1314" y="122">104</text>
+  <text class="num" x="1708" y="94">105</text>
+  <text class="num" x="1886" y="72">106</text>
+  <text class="num" x="1913" y="405">107</text>
+  <text class="num" x="1923" y="693">108</text>
+  <text class="num" x="1920" y="1015">109</text>
+  <text class="num dark" x="302" y="548">1</text>
+  <text class="num dark" x="301" y="588">2A</text>
+  <text class="num dark" x="301" y="617">2B</text>
+  <text class="num dark" x="301" y="666">3</text>
+  <text class="num dark" x="343" y="666">4</text>
+  <text class="num dark" x="378" y="666">5</text>
+  <text class="num dark" x="414" y="666">6</text>
+  <text class="num dark" x="462" y="665">7</text>
+  <text class="num dark" x="499" y="636">8</text>
+  <text class="num dark" x="528" y="599">9</text>
+  <text class="num dark" x="537" y="526">10</text>
+  <text class="num dark" x="464" y="514">11</text>
+  <text class="num" x="411" y="795">12</text>
+  <text class="num" x="398" y="889">13</text>
+  <text class="num" x="352" y="781">14</text>
+  <text class="num" x="299" y="781">15</text>
+  <text class="num dark" x="631" y="963">19</text>
+  <text class="num dark" x="631" y="933">20</text>
+  <text class="num dark" x="632" y="888">21</text>
+  <text class="num dark" x="632" y="841">23</text>
+  <text class="num dark" x="631" y="810">24</text>
+  <text class="num dark" x="645" y="767">25</text>
+  <text class="num dark" x="692" y="761">26</text>
+  <text class="num dark" x="746" y="760">27</text>
+  <text class="num dark" x="802" y="760">29</text>
+  <text class="num dark" x="838" y="761">30</text>
+  <text class="num dark" x="884" y="760">31</text>
+  <text class="num dark" x="884" y="819">32</text>
+  <text class="num dark" x="884" y="875">33</text>
+  <text class="num dark" x="884" y="968">34</text>
+  <text class="num dark" x="819" y="992">35</text>
+  <text class="num dark" x="746" y="992">36</text>
+  <text class="num" x="1100" y="988" font-weight="700">37a</text>
+  <text class="num" x="1183" y="989" font-weight="700">37b</text>
+  <text class="num" x="1052" y="926">38</text>
+  <text class="num" x="1052" y="889">39</text>
+  <text class="num" x="1052" y="861">40</text>
+  <text class="num" x="1052" y="836">41</text>
+  <text class="num" x="1052" y="776">42</text>
+  <text class="num" x="1097" y="768">43</text>
+  <text class="num" x="1134" y="769">44</text>
+  <text class="num" x="1175" y="768">45</text>
+  <text class="num" x="1215" y="769" font-size="14">47</text>
+  <text class="num" x="1241" y="769" font-size="14">48</text>
+  <text class="num" x="1283" y="772">49</text>
+  <text class="num" x="1282" y="832">50</text>
+  <text class="num" x="1283" y="865">51</text>
+  <text class="num" x="1283" y="898">52</text>
+  <text class="num" x="1283" y="930">53</text>
+  <text class="num" x="1282" y="986">54</text>
+  <text class="num" x="1416" y="908">55</text>
+  <text class="num" x="1608" y="1068">56</text>
+  <text class="num" x="1571" y="1024">57</text>
+  <text class="num" x="1558" y="968">58</text>
+  <text class="num" x="1546" y="914">59</text>
+  <text class="num" x="1652" y="925">60</text>
+  <text class="num" x="1542" y="789">61</text>
+  <text class="num" x="1533" y="757">62</text>
+  <text class="num" x="1482" y="673">63</text>
+  <text class="num" x="1283" y="612">64</text><text class="num" x="1334" y="510" transform="rotate(-90 1334 510)">BIBLIOTHEEK</text>
+  <text class="num" x="1220" y="652" font-size="14">65</text>
+  <text class="num" x="1195" y="651" font-size="14">66</text>
+  <text class="num" x="1171" y="652" font-size="14">67</text>
+  <text class="num" x="1144" y="651" font-size="14">68</text>
+  <text class="num" x="1108" y="652" font-size="14">69</text>
+  <text class="num" x="1069" y="641">70</text>
+  <text class="num" x="1056" y="611">71</text>
+  <text class="num" x="1038" y="526">72</text>
+  <text class="num" x="1035" y="438">73</text>
+  <text class="num" x="1035" y="398">74</text>
+  <text class="num" x="1059" y="340">75</text>
+  <text class="num" x="1141" y="330">76</text>
+  <text class="num" x="1198" y="330">77</text>
+  <text class="num dark" x="933" y="519">78</text>
+  <text class="num dark" x="911" y="613">79</text>
+  <text class="num dark" x="868" y="623" font-size="14">80</text>
+  <text class="num dark" x="826" y="636">81</text>
+  <text class="num dark" x="782" y="636">82</text>
+  <text class="num dark" x="739" y="636">83</text>
+  <text class="num dark" x="652" y="636">85</text>
+  <text class="num dark" x="619" y="511">87a</text>
+  <text class="num dark" x="619" y="565">87b</text>
+  <text class="num dark" x="619" y="460">88</text>
+  <text class="num dark" x="619" y="416">89</text>
+  <text class="num dark" x="619" y="371">90</text>
+  <text class="num dark" x="619" y="316">91</text>
+  <text class="num dark" x="686" y="316">90</text>
+  <text class="num dark" x="746" y="316">94</text>
+  <text class="num dark" x="878" y="330">95</text>
+  <text class="num dark" x="945" y="356" font-size="14">96</text>
+  <text class="num dark" x="933" y="390">97</text>
+  <text class="num dark" x="933" y="430">98</text>
+  <text class="num" x="1451" y="1082">110</text><text class="num" x="1432" y="1167" transform="rotate(80 1432 1167)">GEMEENTEHUIS</text>
+  <text class="num" x="737" y="1117">111</text><text class="num" x="717" y="1209">SPORTHAL DE KORF</text>
+  <text class="num" x="628" y="1111" font-weight="700">112</text>
+  <text class="num" x="1628" y="469" font-size="30" font-weight="700">113</text>
+  <text class="num" x="254" y="1328">BRANDWEER</text>
+</g>
+<g id="parking">
+  <g class="picon"><rect x="469" y="337" width="38" height="38"/><text x="488" y="357">P</text></g>
+  <g class="picon"><rect x="1151" y="425" width="38" height="38"/><text x="1170" y="445">P</text></g>
+  <g class="picon"><rect x="816" y="450" width="38" height="38"/><text x="835" y="470">P</text></g>
+  <g class="picon"><rect x="1650" y="616" width="38" height="38"/><text x="1669" y="636">P</text></g>
+  <g class="picon"><rect x="1145" y="855" width="38" height="38"/><text x="1164" y="875">P</text></g>
+  <g class="picon"><rect x="732" y="859" width="38" height="38"/><text x="751" y="879">P</text></g>
+  <g class="picon"><rect x="509" y="1147" width="38" height="38"/><text x="528" y="1167">P</text></g>
+  <g class="picon"><rect x="1797" y="1105" width="38" height="38"/><text x="1816" y="1125">P</text></g>
+  <g class="picon"><rect x="1618" y="1167" width="38" height="38"/><text x="1637" y="1187">P</text></g>
+  <g class="picon"><rect x="103" y="585" width="38" height="38"/><text x="122" y="605" font-size="24">P</text></g>
+  <g class="picon"><rect x="1092" y="1197" width="38" height="38"/><text x="1111" y="1217" font-size="24">P</text></g>
+</g>
+<g id="streets">
+  <text class="street" x="283" y="200">HAMERSVELDSEWEG</text>
+  <text class="street" x="1468" y="200">HAMERSVELDSEWEG</text>
+  <text class="street" x="122" y="476">DE BLEEKERIJ</text>
+  <text class="street" x="117" y="683">DE TWIJNDERIJ</text>
+  <text class="street" x="1804" y="332" transform="rotate(90 1804 332)">DE MULDERIJ</text>
+  <text class="street" x="1804" y="828" transform="rotate(90 1804 828)">DE MULDERIJ</text>
+  <text class="street" x="520" y="1051">DE SMIDSE</text>
+  <text class="street" x="1203" y="1051">DE SMIDSE</text>
+  <text class="street" x="315" y="988" transform="rotate(38 315 988)">DE SMIDSE</text>
+  <text class="street" x="814" y="1364">BURGEMEESTER VAN DER POSTLAAN</text>
+  <text class="street" x="338" y="1165" transform="rotate(38 338 1165)">BURGEMEESTER VAN DER POSTLAAN</text>
+  <text class="street" x="1602" y="1265" transform="rotate(-17 1602 1265)">BURGEMEESTER VAN DER POSTLAAN</text>
+  <text class="street" x="1660" y="1110" transform="rotate(-17 1660 1110)">DE MULDERIJ</text>
+  <text class="lbl" x="412" y="472">DE SMIDSE</text>
+  <text class="lbl" x="399" y="582">KRAMERSHILT</text>
+  <text class="lbl" x="519" y="732">'T PLEIN</text>
+  <text class="lbl" x="579" y="912" transform="rotate(-90 579 912)">'T PLEIN</text>
+  <text class="lbl" x="704" y="454" transform="rotate(-90 704 454)">LOOIERSHILT</text>
+  <text class="lbl" x="818" y="500">EYSINKPLAATS</text>
+  <text class="lbl" x="805" y="564">DE KERVERSHILT</text>
+  <text class="lbl" x="1135" y="567">DE KERVERSHILT</text>
+  <text class="lbl" x="1003" y="271">DE BROUWERIJ</text>
+  <text class="lbl" x="984" y="425" transform="rotate(-90 984 425)">DE BROUWERIJ</text>
+  <text class="lbl" x="1155" y="477">DAFPLAATS</text>
+  <text class="lbl" x="1426" y="362" transform="rotate(-90 1426 362)">DE LIBRIJE</text>
+  <text class="lbl" x="737" y="704">DE GRUTTERIJ</text>
+  <text class="lbl" x="1160" y="704">DE KOMENIJ</text>
+  <text class="lbl" x="743" y="811">DE SCHEPERSHILT</text>
+  <text class="lbl" x="737" y="913">SPIJKERPLAATS</text>
+  <text class="lbl" x="1151" y="825">DE WEVERSHILT</text>
+  <text class="lbl" x="1150" y="918">KROMHOUTPLAATS</text>
+  <text class="lbl" x="984" y="895" transform="rotate(-90 984 895)">KOOIKERSGRACHT</text>
+  <text class="lbl" x="921" y="1210" transform="rotate(-90 921 1210)">KOOIKERSGRACHT</text>
+  <text class="lbl" x="1010" y="1187" transform="rotate(90 1010 1187)">KOOIKERSGRACHT</text>
+  <text class="lbl" x="1404" y="813">'T ERF</text>
+  <text class="lbl" x="1395" y="1036" transform="rotate(-20 1395 1036)">'T ERF</text>
+  <text class="lbl" x="111" y="540">OVERDEKTE</text>
+  <text class="lbl" x="111" y="563">PARKEERPLAATS</text>
+  <text class="lbl" x="1100" y="1159">OVERDEKTE</text>
+  <text class="lbl" x="1100" y="1182">PARKEERPLAATS</text>
+  <text class="lbl" x="133" y="821">POLITIE</text>
+<path d="M104 836 H170" stroke="#222" stroke-width="2"/>
+</g>
+</svg>
+<div class="controls"><button data-zoom="in" aria-label="Inzoomen">+</button><button data-zoom="out" aria-label="Uitzoomen">−</button><button data-zoom="reset" aria-label="Reset">⟲</button></div>
+<div class="tip" hidden></div>
+<div class="sheet" role="dialog" aria-live="polite"><button class="close" aria-label="Sluiten">×</button><h2></h2><p></p></div>
+</div>
+<aside>
+  <div class="filters">
+    <input type="search" placeholder="Zoek op winkel of nummer" aria-label="Zoek winkel">
+    <label><input type="checkbox" id="onlyData"> Alleen winkels met gegevens</label>
+  </div>
+  <div class="count"></div>
+  <ul></ul>
+</aside>
+</div>
+<script>
+// Winkeldata, key = data-id van de polygon. Aanvullen of vervangen door een fetch naar je API.
+const stores = {
+  "13": { name: "Voorbeeldwinkel", info: "Ma-za 9:00-18:00" },
+  "60": { name: "Supermarkt", info: "Dagelijks 8:00-21:00" },
+  "110": { name: "Gemeentehuis", info: "Ma-vr 8:30-17:00" },
+};
+const svg = document.getElementById('map');
+const wrap = svg.parentElement;
+const tip = document.querySelector('.tip');
+const sheet = document.querySelector('.sheet');
+const storeEls = [...svg.querySelectorAll('.store')];
+const byId = Object.fromEntries(storeEls.map(el => [el.dataset.id, el]));
+const info = id => stores[id] || { name: byId[id].getAttribute('aria-label'), info: 'Nog geen gegevens' };
+
+function showTip(el, clientX, clientY) {
+  const s = info(el.dataset.id);
+  tip.innerHTML = `<h3>${s.name}</h3><p>${s.info}</p>`;
+  tip.hidden = false;
+  const m = wrap.getBoundingClientRect();
+  let x = clientX - m.left + 14, y = clientY - m.top + 14;
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  if (x + w > m.width - 4) x = clientX - m.left - w - 14;   // flip naar links
+  if (y + h > m.height - 4) y = clientY - m.top - h - 14;   // flip naar boven
+  tip.style.left = Math.max(4, x) + 'px';
+  tip.style.top = Math.max(4, y) + 'px';
+}
+function hideTip() { tip.hidden = true; }
+
+let active = null;
+const hl = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+hl.setAttribute('class', 'hl'); hl.style.display = 'none';
+svg.querySelector('#numbers').before(hl);   // boven de winkels, onder de nummers
+function select(id) {
+  if (active) active.classList.remove('active');
+  active = id ? byId[id] : null;
+  if (!active) { sheet.classList.remove('open'); hl.style.display = 'none'; document.dispatchEvent(new CustomEvent('storeselect', { detail: null })); return; }
+  active.classList.add('active');
+  hl.setAttribute('points', active.getAttribute('points')); hl.style.display = '';
+  const s = info(id);
+  sheet.querySelector('h2').textContent = s.name;
+  sheet.querySelector('p').textContent = s.info;
+  sheet.classList.add('open');
+  hideTip();
+  document.dispatchEvent(new CustomEvent('storeselect', { detail: id }));
+}
+sheet.querySelector('.close').addEventListener('click', () => select(null));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') select(null); });
+
+// Hover-tooltip alleen voor een echte muis; touch krijgt de sheet via tap
+storeEls.forEach(el => {
+  el.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') showTip(el, e.clientX, e.clientY); });
+  el.addEventListener('pointerleave', hideTip);
+  el.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(el.dataset.id); } });
+});
+
+// ---- Pan & zoom via de viewBox (geen library nodig) ----
+const [, , W, H] = svg.getAttribute('viewBox').split(' ').map(Number);
+const MIN_W = W / 10;          // maximale zoom: 10x
+let vb = { x: 0, y: 0, w: W, h: H };
+
+function aspect() { const r = svg.getBoundingClientRect(); return r.height / r.width; }
+function fit() {                 // hele kaart in beeld; op staande schermen vullen we de hoogte
+  const a = aspect();
+  let w = W, h = W * a;
+  if (h < H) { h = H; w = H / a; }
+  else if (a > 1) { h = H; w = H / a; }   // portrait: kaart vult de hoogte, zijwaarts pannen
+  vb = { x: (W - w) / 2, y: (H - h) / 2, w, h };
+  apply();
+}
+function clamp() {
+  const a = aspect();
+  vb.w = Math.min(Math.max(vb.w, MIN_W), Math.max(W, H / a));
+  vb.h = vb.w * a;
+  // binnen de kaart blijven; als de view groter is dan de kaart, centreren
+  vb.x = vb.w >= W ? (W - vb.w) / 2 : Math.min(Math.max(vb.x, 0), W - vb.w);
+  vb.y = vb.h >= H ? (H - vb.h) / 2 : Math.min(Math.max(vb.y, 0), H - vb.h);
+}
+function apply() { clamp(); svg.setAttribute('viewBox', `${vb.x} ${vb.y} ${vb.w} ${vb.h}`); }
+function toSvg(cx, cy) {
+  const r = svg.getBoundingClientRect();
+  return { x: vb.x + (cx - r.left) / r.width * vb.w, y: vb.y + (cy - r.top) / r.height * vb.h };
+}
+function zoomAt(factor, cx, cy) {
+  const p = toSvg(cx, cy);
+  const nw = Math.min(Math.max(vb.w * factor, MIN_W), W * 2);
+  const k = nw / vb.w;
+  vb = { x: p.x - (p.x - vb.x) * k, y: p.y - (p.y - vb.y) * k, w: nw, h: nw * aspect() };
+  apply();
+}
+function zoomCenter(factor) {
+  const r = svg.getBoundingClientRect();
+  zoomAt(factor, r.left + r.width / 2, r.top + r.height / 2);
+}
+
+svg.addEventListener('wheel', e => {
+  e.preventDefault();
+  zoomAt(Math.exp(e.deltaY * 0.0015), e.clientX, e.clientY);
+}, { passive: false });
+
+// Pointer events: 1 vinger/muis = pannen, 2 vingers = pinch; korte tik zonder beweging = selecteren
+const pointers = new Map();
+let start = null, pinch = null;
+svg.addEventListener('pointerdown', e => {
+  svg.setPointerCapture(e.pointerId);
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pointers.size === 1) {
+    start = { x: e.clientX, y: e.clientY, vb: { ...vb }, target: e.target.closest('.store'), moved: false };
+  } else if (pointers.size === 2) {
+    const [a, b] = [...pointers.values()];
+    pinch = { d: Math.hypot(a.x - b.x, a.y - b.y), mid: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 } };
+    if (start) start.moved = true;
+  }
+});
+svg.addEventListener('pointermove', e => {
+  if (!pointers.has(e.pointerId)) return;
+  pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+  if (pointers.size === 2 && pinch) {
+    const [a, b] = [...pointers.values()];
+    const d = Math.hypot(a.x - b.x, a.y - b.y);
+    const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    const r = svg.getBoundingClientRect();
+    vb.x -= (mid.x - pinch.mid.x) / r.width * vb.w;   // pan met het midden mee
+    vb.y -= (mid.y - pinch.mid.y) / r.height * vb.h;
+    zoomAt(pinch.d / d, mid.x, mid.y);
+    pinch = { d, mid };
+  } else if (pointers.size === 1 && start) {
+    const dx = e.clientX - start.x, dy = e.clientY - start.y;
+    if (!start.moved && Math.hypot(dx, dy) > 6) { start.moved = true; svg.classList.add('dragging'); hideTip(); }
+    if (start.moved) {
+      const r = svg.getBoundingClientRect();
+      vb.x = start.vb.x - dx / r.width * vb.w;
+      vb.y = start.vb.y - dy / r.height * vb.h;
+      apply();
+    }
+  }
+});
+function endPointer(e) {
+  if (!pointers.has(e.pointerId)) return;
+  pointers.delete(e.pointerId);
+  if (pointers.size < 2) pinch = null;
+  if (pointers.size === 0) {
+    if (start && !start.moved) select(start.target ? start.target.dataset.id : null);
+    start = null;
+    svg.classList.remove('dragging');
+  } else if (pointers.size === 1) {        // van pinch terug naar pannen zonder sprong
+    const [p] = [...pointers.values()];
+    start = { x: p.x, y: p.y, vb: { ...vb }, target: null, moved: true };
+  }
+}
+svg.addEventListener('pointerup', endPointer);
+svg.addEventListener('pointercancel', endPointer);
+
+document.querySelector('.controls').addEventListener('click', e => {
+  const z = e.target.closest('button')?.dataset.zoom;
+  if (z === 'in') zoomCenter(0.7);
+  if (z === 'out') zoomCenter(1 / 0.7);
+  if (z === 'reset') fit();
+});
+
+// Toetsenbord: bij focus op een winkel die buiten beeld valt, erheen pannen
+storeEls.forEach(el => el.addEventListener('focus', () => {
+  const b = el.getBBox();
+  if (b.x < vb.x || b.y < vb.y || b.x + b.width > vb.x + vb.w || b.y + b.height > vb.y + vb.h) {
+    vb.x = b.x + b.width / 2 - vb.w / 2; vb.y = b.y + b.height / 2 - vb.h / 2; apply();
+  }
+}));
+
+new ResizeObserver(() => { const cx = vb.x + vb.w / 2, cy = vb.y + vb.h / 2; vb.h = vb.w * aspect();
+  vb.x = cx - vb.w / 2; vb.y = cy - vb.h / 2; apply(); }).observe(svg);
+fit();
+
+// ---- Soepel naar een winkel zoomen ----
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let anim = null;
+function animateTo(target, ms = 450) {
+  cancelAnimationFrame(anim);
+  if (reduceMotion) { vb = { ...target }; apply(); return; }
+  const from = { ...vb }, t0 = performance.now();
+  const ease = t => t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  const step = now => {
+    const t = Math.min(1, (now - t0) / ms), k = ease(t);
+    vb = { x: from.x + (target.x - from.x) * k, y: from.y + (target.y - from.y) * k,
+           w: from.w + (target.w - from.w) * k, h: 0 };
+    vb.h = vb.w * aspect(); apply();
+    if (t < 1) anim = requestAnimationFrame(step);
+  };
+  anim = requestAnimationFrame(step);
+}
+function focusStore(id) {
+  const b = byId[id].getBBox(), a = aspect();
+  // zo ver inzoomen dat de unit ongeveer 1/5 van de breedte of hoogte vult
+  let w = Math.max(b.width * 5, b.height * 5 / a);
+  w = Math.min(Math.max(w, W / 8), W / 2);
+  const h = w * a;
+  animateTo({ x: b.x + b.width / 2 - w / 2, y: b.y + b.height / 2 - h / 2, w, h });
+}
+// Handmatig pannen of zoomen breekt een lopende animatie af
+svg.addEventListener('pointerdown', () => cancelAnimationFrame(anim));
+svg.addEventListener('wheel', () => cancelAnimationFrame(anim), { passive: true });
+
+// ---- Winkellijst ----
+const list = document.querySelector('aside ul');
+const search = document.querySelector('aside input[type=search]');
+const onlyData = document.getElementById('onlyData');
+const count = document.querySelector('.count');
+const ids = storeEls.map(el => el.dataset.id)
+  .filter((v, i, a) => a.indexOf(v) === i)
+  .sort((a, b) => a.localeCompare(b, 'nl', { numeric: true }));
+
+function render() {
+  const q = search.value.trim().toLowerCase();
+  list.innerHTML = '';
+  let n = 0;
+  ids.forEach(id => {
+    if (onlyData.checked && !stores[id]) return;
+    const s = info(id);
+    if (q && !(id.replace('-2', '').toLowerCase().includes(q) || s.name.toLowerCase().includes(q))) return;
+    const li = document.createElement('li');
+    li.innerHTML = `<button data-id="${id}"><span class="sw" style="background:${byId[id].getAttribute('fill')}"></span>
+      <span class="n">${id.replace('-2', '')}</span><span>${s.name}<br><small>${s.info}</small></span></button>`;
+    if (active && active.dataset.id === id) li.firstChild.classList.add('active');
+    list.appendChild(li); n++;
+  });
+  count.textContent = `${n} van ${ids.length} units`;
+  if (!n) list.innerHTML = '<li class="empty">Niets gevonden.</li>';
+}
+search.addEventListener('input', render);
+onlyData.addEventListener('change', render);
+
+list.addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const id = b.dataset.id;
+  if (window.innerWidth <= 1000) document.querySelector('.viewer').scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
+  focusStore(id);
+  select(id);
+});
+// Hover in de lijst licht de unit op de kaart op
+list.addEventListener('pointerover', e => { const b = e.target.closest('button'); if (b) byId[b.dataset.id].classList.add('active'); });
+list.addEventListener('pointerout', e => { const b = e.target.closest('button');
+  if (b && byId[b.dataset.id] !== active) byId[b.dataset.id].classList.remove('active'); });
+
+// Selectie op de kaart: markeer in de lijst en scroll hem in beeld (alleen binnen de lijst)
+document.addEventListener('storeselect', e => {
+  let hit = null;
+  list.querySelectorAll('button').forEach(b => { const on = b.dataset.id === e.detail; b.classList.toggle('active', on); if (on) hit = b; });
+  if (hit) {
+    const lr = list.getBoundingClientRect(), br = hit.getBoundingClientRect();
+    if (br.top < lr.top || br.bottom > lr.bottom) list.scrollTop += br.top - lr.top - lr.height / 2 + br.height / 2;
+  }
+});
+sheet.querySelector('.close').addEventListener('click', () => list.querySelectorAll('button.active').forEach(b => b.classList.remove('active')));
+render();
+</script></body></html>

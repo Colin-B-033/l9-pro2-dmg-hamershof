@@ -27,3 +27,4 @@ Route::get('/home', function () {
     return view('home');
 });
 
+Route::view('/plattegrond', 'plattegrond')->name('plattegrond');
