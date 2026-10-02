@@ -13,11 +13,10 @@
 			<h1>Bezoek Ons</h1>
 			<p>Kom langs en ontdek alles wat we te bieden hebben!</p>
 		</header>
+		<div class="mapcontainer">
+			<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2449.297371758489!2d5.42489277616745!3d52.12891196511154!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c645b8b821cce9%3A0x4a39a271140d0e0b!2sWinkelcentrum%20de%20Hamershof%20%F0%9F%9B%8D!5e0!3m2!1snl!2snl!4v1790846115879!5m2!1snl!2snl" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+		</div>
 
-		<section class="visit-location" aria-label="Locatie">
-			<div class="visit-icon visit-icon--pin" aria-hidden="true">&#9906;</div>
-			<p>Winkelcentrum Hamershof<br>Hamershof 1, 3831 AA Leusden<br>Nederland</p>
-		</section>
 
 		<section class="visit-contact-grid" aria-label="Contactgegevens">
 			<article>

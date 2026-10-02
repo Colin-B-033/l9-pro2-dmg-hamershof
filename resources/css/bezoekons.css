@@ -120,3 +120,13 @@
 	.visit-form textarea { min-height: 110px; }
 	.visit-form button { height: 42px; }
 }
+
+.mapcontainer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.mapcontainer iframe {
+	max-width: 100%;
+}
