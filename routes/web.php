@@ -38,3 +38,6 @@ Route::get('/events', function () {
 Route::get('/bezoekons', function () {
     return view('bezoekons');
 });
+Route::get('/tehuur', function () {
+    return view('tehuur');
+});
