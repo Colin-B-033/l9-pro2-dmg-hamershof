@@ -48,14 +48,21 @@
 .visit-contact-grid {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
-	border-bottom: 2px solid #1596e5;
-	background: #fafafa;
+	gap: 20px;
+	width: 82%;
+	margin: 32px auto 0;
+	text-align: center;
 }
 
-.visit-contact-grid article { min-height: 125px; padding: 28px 30px 20px; border-right: 1px solid #eee; }
-.visit-contact-grid article:last-child { border-right: 0; }
-.visit-contact-grid h2 { margin: 10px 0 7px; font-size: 18px; font-weight: 600; }
-.visit-contact-grid p { margin: 0; color: #888; font-size: 15px; line-height: 1.4; }
+.visit-contact-grid article { min-width: 0; }
+.visit-contact-grid .visit-icon {
+	display: block;
+	font-size: 40px;
+	line-height: 1;
+}
+.visit-contact-grid h2,
+.visit-service h3 { margin: 12px 0 7px; font-size: 18px; font-weight: 700; }
+.visit-contact-grid p { margin: 0; color: #777; font-size: 15px; line-height: 1.5; }
 
 .visit-hours {
 	width: 65%;
@@ -79,7 +86,6 @@
 .visit-service-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 82%; margin: 32px auto 0; }
 .visit-service-grid article { min-width: 0; }
 .visit-service-icon { display: block; font-size: 40px; line-height: 1; }
-.visit-service h3 { margin: 12px 0 7px; font-size: 18px; }
 .visit-service p { margin: 0; color: #777; font-size: 15px; line-height: 1.5; }
 .visit-service a { display: inline-block; margin-top: 12px; padding: 9px 16px; color: #fff; background: #050505; font-size: 14px; text-decoration: none; }
 
@@ -101,7 +107,7 @@
 	.visit-location p { font-size: 15px; }
 	.visit-icon { font-size: 28px; }
 	.visit-icon--pin { font-size: 34px; }
-	.visit-contact-grid article { min-height: 125px; padding: 28px 30px 20px; }
+	.visit-contact-grid { margin-top: 32px; }
 	.visit-contact-grid h2 { font-size: 18px; }
 	.visit-contact-grid p { font-size: 15px; }
 	.visit-hours { margin-top: 80px; padding: 20px 24px 18px; }
@@ -128,5 +134,9 @@
 }
 
 .mapcontainer iframe {
+	padding: 30px;
+	width: 750px;
+	height: 500px;
 	max-width: 100%;
+	max-height: 100%;
 }
