@@ -6,8 +6,8 @@
     <title>Alle winkels | De Hamershof</title>
     @vite('resources/css/app.css')
 </head>
-@include('nav')
 <body class="home-page site-layout stores-page">
+    @include('nav')
     <main>
         <section class="stores-hero" aria-labelledby="stores-title">
             <h1 id="stores-title">Onze Winkels</h1>

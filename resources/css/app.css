@@ -10,6 +10,23 @@
 @tailwind utilities;
 
 :root {
+    color-scheme: light;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
+    overflow-x: hidden;
+}
+
+body {
+    margin: 0;
+    min-width: 320px;
+}
+
+:root {
     --ink: #1d1d1b;
     --paper: #fff;
     --line: #d8d8d6;
@@ -29,4 +46,3 @@
     white-space: nowrap;
     border: 0;
 }
-

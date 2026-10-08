@@ -169,6 +169,22 @@
     .login-card {
         width: min(100%, 520px);
         margin-top: 36px;
+        min-height: 0;
+        padding: 2rem 1.25rem 2.5rem;
+    }
+
+    .login-card h1 {
+        font-size: clamp(2.2rem, 11vw, 3rem);
+    }
+
+    .login-card__intro {
+        margin-bottom: 2rem;
+    }
+
+    .login-form__label-row {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.45rem;
     }
 
     .login-footer {

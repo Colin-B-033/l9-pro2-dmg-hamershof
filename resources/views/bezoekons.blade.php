@@ -5,9 +5,9 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Bezoek Ons | De Hamershof</title>
 	@vite('resources/css/app.css')
-    @include('nav')
 </head>
 <body class="visit-page">
+	@include('nav')
 	<main>
 		<header class="visit-hero">
 			<h1>Bezoek Ons</h1>

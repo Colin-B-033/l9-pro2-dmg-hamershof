@@ -273,3 +273,18 @@ body.events-page {
 		right: 8px;
 	}
 }
+
+@media (max-width: 360px) {
+	.events-content {
+		padding-left: 14px;
+		padding-right: 14px;
+	}
+
+	.events-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.event-card__visual {
+		height: 210px;
+	}
+}

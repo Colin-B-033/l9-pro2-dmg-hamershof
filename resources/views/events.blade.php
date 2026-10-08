@@ -6,8 +6,8 @@
 	<title>Evenementen | De Hamershof</title>
 	@vite(['resources/css/app.css', 'resources/css/events.css'])
 </head>
-@include('nav')
 <body class="events-page">
+	@include('nav')
 	<main class="events-shell">
 		<header class="events-intro">
 			<h1>Evenementen</h1>
