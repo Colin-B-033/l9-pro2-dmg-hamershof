@@ -22,7 +22,7 @@
 
 		<nav aria-label="Hoofdnavigatie">
 			<a href="/">Home</a>
-			<a href="/te-huur">Te Huur</a>
+			<a href="/tehuur">Te Huur</a>
 			<a href="/plattegrond">Plattegrond</a>
 			<a href="/nieuws">Evenementen</a>
 			<a href="/agenda">Agenda</a>

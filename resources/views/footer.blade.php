@@ -18,7 +18,7 @@
                 <div class="site-footer__link-columns">
                     <ul>
                         <li><a href="/">Home</a></li>
-                        <li><a href="/te-huur">Te Huur</a></li>
+                        <li><a href="/tehuur">Te Huur</a></li>
                         <li><a href="/plattegrond">Plattegrond</a></li>
                         <li><a href="/nieuws">Nieuws</a></li>
                         <li><a href="/agenda">Agenda</a></li>

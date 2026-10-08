@@ -4,6 +4,7 @@
 @import './login.css';
 @import './stores.css';
 @import './bezoekons.css';
+@import './tehuur.css';
 
 @tailwind base;
 @tailwind components;
@@ -29,4 +30,3 @@
     white-space: nowrap;
     border: 0;
 }
-
