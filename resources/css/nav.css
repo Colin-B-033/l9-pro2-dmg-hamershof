@@ -218,8 +218,84 @@ body.menu-is-open {
 
 @media (max-width: 430px) {
     .site-navigation {
-        padding-right: 30px;
-        padding-left: 30px;
+        width: 100vw;
+        padding: 0 67px 63px;
+    }
+
+    .site-navigation__close {
+        top: 14px;
+        left: 10px;
+        width: 24px;
+        height: 24px;
+        font-size: 32px;
+    }
+
+    .site-navigation__logo {
+        margin: 67px auto 58px;
+    }
+
+    .site-navigation__logo span {
+        font-size: 36px;
+        line-height: 36px;
+    }
+
+    .site-navigation__logo small {
+        font-size: 12px;
+        line-height: 15px;
+    }
+
+    .site-navigation nav {
+        gap: 12px;
+    }
+
+    .site-navigation nav a,
+    .site-navigation nav a:first-child,
+    .site-navigation nav a:nth-child(2) {
+        font-size: 18px;
+        line-height: 22px;
+    }
+
+    .site-navigation__login {
+        margin-top: 29px;
+        font-size: 12px;
+        line-height: 16px;
+    }
+
+    .site-navigation__login span {
+        font-size: 18px;
+    }
+
+    .site-navigation__footer {
+        column-gap: 14px;
+        row-gap: 7px;
+        padding-top: 0;
+        border-top: 0;
+        font-size: 10px;
+    }
+
+    .site-navigation__footer > span:first-child {
+        padding-bottom: 4px;
+    }
+
+    .site-navigation__footer > a {
+        width: 16px;
+        height: 16px;
+        border-width: 1px;
+        font-size: 12px;
+        line-height: 14px;
+    }
+
+    .site-navigation__footer > a:nth-of-type(2) {
+        margin-left: 23px;
+    }
+
+    .site-navigation__contact {
+        padding-bottom: 4px;
+        line-height: 13px;
+    }
+
+    .site-navigation__phone {
+        line-height: 13px;
     }
 
     .site-navigation__contact {

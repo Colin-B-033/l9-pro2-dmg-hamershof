@@ -26,6 +26,7 @@
     display: flex;
     align-items: flex-end;
     isolation: isolate;
+    min-height: 620px;
     color: #fff;
 }
 
@@ -180,7 +181,7 @@
 .home-categories__grid {
     display: grid;
     gap: 1.5rem;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
 }
 
 .home-category {

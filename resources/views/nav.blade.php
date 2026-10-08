@@ -24,10 +24,10 @@
 			<a href="/">Home</a>
 			<a href="/te-huur">Te Huur</a>
 			<a href="/plattegrond">Plattegrond</a>
-			<a href="/nieuws">Evenementen</a>
+			<a href="/nieuws">Nieuws</a>
 			<a href="/agenda">Agenda</a>
-			<a href="/markten">Winkels</a>
-			<a href="/hamershofbon">Bezoek ons</a>
+			<a href="/markten">Markten</a>
+			<a href="/hamershofbon">Hamershofbon</a>
 			<a href="/contact">Contact</a>
 		</nav>
 
