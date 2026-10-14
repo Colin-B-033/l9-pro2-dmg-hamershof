@@ -1,64 +1,5 @@
-<!DOCTYPE html>
-<html lang="nl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plattegrond | De Hamershof</title>
-    @vite('resources/css/app.css')
-</head>
-<body class="map-page">
-    <a class="map-skip-link" href="#plattegrond">Naar de plattegrond</a>
-
-    <header class="map-header">
-        <div class="map-header__inner">
-            <details class="map-menu">
-                <summary aria-label="Navigatiemenu"><span></span><span></span><span></span></summary>
-                <nav aria-label="Hoofdnavigatie">
-                    <a href="{{ url('/home') }}">Home</a>
-                    <a href="{{ route('plattegrond') }}" aria-current="page">Plattegrond</a>
-                    <a href="{{ url('/login') }}">Inloggen</a>
-                </nav>
-            </details>
-
-            <a class="map-brand" href="{{ url('/home') }}" aria-label="De Hamershof — home">
-                <span>de <em>Hamershof</em></span>
-                <small>winkelen in het hart van Leusden</small>
-            </a>
-        </div>
-    </header>
-
-    <main id="plattegrond" class="map-main">
-        <section class="map-intro" aria-labelledby="map-title">
-            <h1 id="map-title">Plattegrond</h1>
-            <p>Ontdek waar al onze winkels zich bevinden in De Hamershof</p>
-        </section>
-
-        <div class="map-columns">
-            <section class="map-panel map-panel--image" aria-labelledby="map-image-title">
-                <h2 id="map-image-title">Interactieve Kaart</h2>
-                <div class="map-image-wrap">
-                <img
-                    class="map-image"
-                    src="{{ asset('images/plattegrond-hamershof.jpg') }}"
-                    alt="Plattegrond van winkelcentrum De Hamershof met genummerde winkelpanden, straten en parkeerplaatsen."
-                    width="2000"
-                    height="1427"
-                >
-                    <button type="button" class="map-mitra-area mitra-hover" aria-label="Winkel 1: Drankenspeciaalzaak MITRA"></button>
-                    <span class="map-mitra-label" aria-hidden="true">1 · Drankenspeciaalzaak MITRA</span>
-                      <button type="button" class="map-sns-area sns-hover" aria-label="Winkel 2: SNS"></button>
-                     <span class="map-sns-label" aria-hidden="true">2 · SNS</span>
-                     <button type="button" class="map-sns-area sns-hover" aria-label="Winkel 2: The Travel Company"></button>
-                     <span class="map-sns-label" aria-hidden="true">2 · The Travel Company</span>
-                </div>
-                </div>
-            </section>
-
-            <aside class="map-panel map-panel--shops" aria-labelledby="map-shops-title">
-                <h2 id="map-shops-title">Op de Kaart</h2>
-                <div class="map-shop-scroll" tabindex="0" role="region" aria-label="Winkellijst, scroll voor meer winkels">
-                    <ul class="map-shops">
-                        @foreach ([
+<?php
+return [
                             ['1', 'Drankenspeciaalzaak MITRA'],
                             ['2', 'SNS'],
                             ['2', 'The Travel Company'],
@@ -139,23 +80,4 @@
                             ['111', 'De Korf'],
                             ['112', 'Theater De Tuin'],
                             ['113', 'Fietsen van Greefhorst'],
-                        ] as [$number, $name])
-                            <li @class(['map-shop--mitra' => $number === '1'])>
-                                @if ($number === '1')
-                                    <button type="button" class="map-shop-button mitra-hover" aria-label="Toon winkel 1: Drankenspeciaalzaak MITRA op de kaart">
-                                        <span class="map-shop-number">{{ $number }}</span><span>{{ $name }}</span>
-                                    </button>
-                                @else
-                                    <span class="map-shop-number">{{ $number }}</span><span>{{ $name }}</span>
-                                @endif
-                            </li>
-                        @endforeach
-                    </ul>
-                </div>
-            </aside>
-        </div>
-    </main>
-
-    @include('footer')
-</body>
-</html>
+                        ];
