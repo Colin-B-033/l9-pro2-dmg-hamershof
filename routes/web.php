@@ -27,12 +27,11 @@ Route::get('/home', function () {
     return view('home');
 });
 
-Route::view('/plattegrond', 'plattegrond-page')->name('plattegrond');
+Route::get('/plattegrond', function () {
+    return view('plattegrond', ['shops' => config('map-shops')]);
+})->name('plattegrond');
 
-Route::get('/plattegrond/ontwerpen/{design?}', function ($design = '1') {
-    abort_unless(in_array($design, ['1', '2', '3'], true), 404);
-    return view('map-designs.index', ['design' => $design, 'shops' => config('map-shops')]);
-})->name('map-designs');
+Route::redirect('/plattegrond/ontwerpen/{design?}', '/plattegrond');
 
 Route::get('/winkels', function () {
     return view('stores');

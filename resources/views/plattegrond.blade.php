@@ -1,31 +1,21 @@
-@php
-    $titles = ['1' => 'Vind jouw winkel.', '2' => 'Alles dichtbij.', '3' => 'Waar ben je naar op zoek?'];
-    $labels = ['1' => 'Zoeken centraal', '2' => 'Compact overzicht', '3' => 'Winkels eerst'];
-@endphp
 <!doctype html>
 <html lang="nl">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $labels[$design] }} · De Hamershof</title>
-    <link rel="stylesheet" href="{{ asset('css/map-designs.css') }}">
-    <script src="{{ asset('js/map-designs.js') }}" defer></script>
+    <title>Plattegrond · De Hamershof</title>
+    <link rel="stylesheet" href="{{ asset('css/plattegrond.css') }}">
+    <script src="{{ asset('js/plattegrond.js') }}" defer></script>
 </head>
-<body class="design-page design-{{ $design }}">
+<body class="design-page">
     <a class="skip" href="#main">Naar de winkels</a>
     <header class="design-header">
         <a class="brand" href="/home">de <em>Hamershof</em><small>winkelen in het hart van Leusden</small></a>
-        <a href="/plattegrond">Huidige plattegrond ↗</a>
+        <a href="/home">Terug naar home ↗</a>
     </header>
-    <nav class="design-picker" aria-label="Kies een ontwerp">
-        <span>ONTWERPSTUDIO</span>
-        @foreach ($labels as $key => $label)
-            <a href="{{ route('map-designs', ['design' => $key]) }}" @if ((string) $key === $design) aria-current="page" @endif><b>0{{ $key }}</b> {{ $label }}</a>
-        @endforeach
-    </nav>
-    <main id="main" class="design-main">
+<main id="main" class="design-main">
         <section class="hero">
-            <div><p class="eyebrow">ONTDEK DE HAMERSHOF · LEUSDEN</p><h1>{{ $titles[$design] }}</h1>
+            <div><p class="eyebrow">ONTDEK DE HAMERSHOF · LEUSDEN</p><h1>Vind jouw winkel.</h1>
             <p class="intro">Van je dagelijkse boodschappen tot iets bijzonders. Zoek je winkel en ontdek waar je moet zijn.</p></div>
             <div class="search-box">
                 <label for="shop-search">Welke winkel zoek je?</label>
@@ -36,7 +26,7 @@
         <div class="workspace">
             <section class="map-card" aria-labelledby="map-heading">
                 <div class="section-heading"><div><p class="eyebrow">ZO VIND JE DE WEG</p><h2 id="map-heading">De plattegrond</h2></div><button class="outline-button" id="enlarge" type="button">Vergroot kaart ↗</button></div>
-                <div class="map-stage">@include('map-designs.map')</div>
+                <div class="map-stage">@include('plattegrond-map')</div>
                 <div class="map-caption"><span class="dot"></span><span>Scroll gerust verder. Vergroot de kaart om de winkels beter te bekijken.</span></div>
                 <div class="selection" aria-live="polite"><span class="selection-number">↗</span><div><strong id="selected-name">Kies een winkel</strong><p id="selected-note">Tik op een winkel in de lijst of op de kaart.</p></div><button type="button" id="clear-selection" aria-label="Selectie wissen" hidden>×</button></div>
             </section>
