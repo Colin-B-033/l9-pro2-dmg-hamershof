@@ -41,3 +41,5 @@ Route::get('/winkels', function () {
 Route::get('/events', function () {
     return view('events');
 });
+
+Route::view('/agenda', 'agenda')->name('agenda');
