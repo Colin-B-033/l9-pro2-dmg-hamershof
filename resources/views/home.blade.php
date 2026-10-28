@@ -15,9 +15,14 @@
 			</video>
 			<div class="home-hero__shade"></div>
 			<div class="home-hero__content">
-				<h1 id="home-title">Alles op één plek</h1>
-				<p class="home-hero__intro">Het winkelcentrum van Hamershof waar winkelen, wonen, werken, boodschappen doen, recreëren, cultuur, educatie en leisure samenkomen.</p>
-			</div>
+    <svg class="home-hero__lines" width="279" height="508" viewBox="0 0 279 508" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <line x1="231.729" y1="84.9149" x2="276.255" y2="1.17367" stroke="white" stroke-width="5"></line>
+        <path d="M2.2074 506.492L49.152 418.202" stroke="white" stroke-width="5"></path>
+    </svg>
+
+    <h1 id="home-title">Alles op één plek</h1>
+    <p class="home-hero__intro">Het winkelcentrum van Hamershof waar winkelen, wonen, werken, boodschappen doen, recreëren, cultuur, educatie en leisure samenkomen.</p>
+</div>
 		</section>
 
 		<section class="home-welcome" aria-labelledby="welcome-title">
