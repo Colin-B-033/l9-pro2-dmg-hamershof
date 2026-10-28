@@ -15,7 +15,6 @@
 			</video>
 			<div class="home-hero__shade"></div>
 			<div class="home-hero__content">
-				<p class="home-hero__eyebrow">De Hamershof</p>
 				<h1 id="home-title">Alles op één plek</h1>
 				<p class="home-hero__intro">Het winkelcentrum van Hamershof waar winkelen, wonen, werken, boodschappen doen, recreëren, cultuur, educatie en leisure samenkomen.</p>
 			</div>
