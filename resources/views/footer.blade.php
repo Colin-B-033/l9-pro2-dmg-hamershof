@@ -18,6 +18,7 @@
                 <div class="site-footer__link-columns">
                     <ul>
                         <li><a href="/">Home</a></li>
+                        <li><a href="/winkels">Winkels</a></li>
                         <li><a href="/te-huur">Te Huur</a></li>
                         <li><a href="/plattegrond">Plattegrond</a></li>
                         <li><a href="/nieuws">Nieuws</a></li>

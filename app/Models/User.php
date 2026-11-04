@@ -27,6 +27,9 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
+     * Let op: 'is_admin' staat hier bewust NIET tussen, zodat niemand
+     * zichzelf via registratie of profielformulier beheerder kan maken.
+     *
      * @var array<int, string>
      */
     protected $fillable = [
@@ -66,6 +69,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
         ];
     }
 }

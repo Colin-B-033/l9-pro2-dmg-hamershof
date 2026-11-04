@@ -1,6 +1,10 @@
 import './bootstrap';
 import '../css/app.css';
 
+// Laat Vite de bestanden in resources/assets (zoals Home.mp4) meenemen in de build,
+// zodat Vite::asset('resources/assets/...') in de Blade-pagina's werkt na `npm run build`.
+import.meta.glob(['../assets/**']);
+
 import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';

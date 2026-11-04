@@ -22,6 +22,7 @@
 
 		<nav aria-label="Hoofdnavigatie">
 			<a href="/">Home</a>
+			<a href="/winkels">Winkels</a>
 			<a href="/te-huur">Te Huur</a>
 			<a href="/plattegrond">Plattegrond</a>
 			<a href="/nieuws">Nieuws</a>
@@ -31,9 +32,19 @@
 			<a href="/contact">Contact</a>
 		</nav>
 
-		<a class="site-navigation__login" href="/login">
-			<span aria-hidden="true">↪</span> Winkelier inloggen
-		</a>
+		@if (auth()->user()?->is_admin)
+			<a class="site-navigation__login" href="/admin">
+				<span aria-hidden="true">↪</span> Naar beheer
+			</a>
+		@elseif (auth()->check())
+			<a class="site-navigation__login" href="/dashboard">
+				<span aria-hidden="true">↪</span> Mijn account
+			</a>
+		@else
+			<a class="site-navigation__login" href="/login">
+				<span aria-hidden="true">↪</span> Winkelier inloggen
+			</a>
+		@endif
 
 		<div class="site-navigation__footer">
 			<span>Follow us</span>

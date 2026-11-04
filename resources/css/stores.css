@@ -45,7 +45,7 @@
     text-decoration: none;
 }
 
-.stores-filter a:first-child,
+.stores-filter a.is-active,
 .stores-filter a:hover {
     background: #111;
     color: #fff;
@@ -105,6 +105,55 @@
 .store-card__image--eten video { object-position: 85% center; }
 .store-card__image--diensten video { object-position: 35% center; }
 
+/* Fallback zolang winkels nog geen eigen afbeelding hebben:
+   10% zwart met beginletter en de schuine lijn uit het merkboek. */
+.store-card__image--fallback {
+    align-items: center;
+    background: #e6e7e8;
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.store-card__image--fallback::before {
+    background: #1d1d1b;
+    content: '';
+    height: 70%;
+    left: 22%;
+    position: absolute;
+    top: 15%;
+    transform: rotate(28deg);
+    width: 1px;
+}
+
+.store-card__image--fallback span {
+    color: #1d1d1b;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-style: italic;
+}
+
+.store-card__meta {
+    margin-top: 0.2rem !important;
+}
+
+.stores-empty {
+    background: #e6e7e8;
+    padding: 2.5rem 1rem;
+    text-align: center;
+}
+
+.stores-empty p {
+    color: #4a4d4d;
+    font-size: 0.75rem;
+    margin: 0 0 0.75rem;
+}
+
+.stores-empty a {
+    color: #1d1d1b;
+    font-size: 0.7rem;
+}
+
 .store-card__body {
     padding: 0.35rem 0.45rem 0.42rem;
 }
@@ -150,6 +199,7 @@
 
     .stores-filter {
         gap: 1.25rem;
+        justify-content: flex-start; /* anders valt de eerste knop links buiten beeld bij scrollen */
         padding-left: 1.5rem;
         padding-right: 1.5rem;
     }

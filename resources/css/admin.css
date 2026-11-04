@@ -1,0 +1,323 @@
+/*
+ * Beheeromgeving (CMS) De Hamershof.
+ * Huisstijl uit het merkboek: wit, zwart, 10% zwart, serifkoppen en veel witruimte.
+ * Los van app.css, zodat de openbare pagina's niet veranderen.
+ */
+
+:root {
+    --admin-ink: #1d1d1b;
+    --admin-paper: #fff;
+    --admin-grey: #e6e7e8; /* 10% zwart */
+    --admin-line: #c9cacb;
+    --admin-muted: #5c5f61;
+    --admin-error: #a4161a;
+    --admin-success: #1f5f3b;
+    --admin-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    --admin-sans: Arial, Helvetica, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body.admin {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--admin-grey);
+    color: var(--admin-ink);
+    font-family: var(--admin-sans);
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.admin a { color: var(--admin-ink); }
+
+.admin h1,
+.admin h2 {
+    font-family: var(--admin-serif);
+    font-weight: 400;
+    line-height: 1.15;
+}
+
+.admin h1 { font-size: clamp(2rem, 4vw, 2.75rem); margin: 0 0 1.5rem; }
+.admin h2 { font-size: 1.6rem; margin: 0 0 0.5rem; }
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Kop met logo, navigatie en uitloggen */
+.admin-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 2.5rem;
+    padding: 1.1rem clamp(1rem, 4vw, 3rem);
+    background: var(--admin-paper);
+    border-bottom: 1px solid var(--admin-line);
+}
+
+.admin-logo {
+    font-family: var(--admin-serif);
+    font-size: 1.5rem;
+    line-height: 1;
+    text-decoration: none;
+}
+
+.admin-logo small {
+    display: block;
+    margin-top: 0.25rem;
+    color: var(--admin-muted);
+    font-family: var(--admin-sans);
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.admin-nav { display: flex; gap: 1.75rem; flex: 1; }
+
+.admin-nav a {
+    padding: 0.25rem 0;
+    border-bottom: 2px solid transparent;
+    text-decoration: none;
+}
+
+.admin-nav a:hover,
+.admin-nav a.is-active { border-bottom-color: var(--admin-ink); }
+
+.admin-user {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: var(--admin-muted);
+    font-size: 0.95rem;
+}
+
+.admin-user form { margin: 0; }
+
+.admin-link-button {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--admin-ink);
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* Inhoud */
+.admin-main {
+    position: relative;
+    max-width: 1080px;
+    margin: 2.5rem auto;
+    padding: clamp(1.5rem, 4vw, 3rem);
+    background: var(--admin-paper);
+    overflow: hidden;
+}
+
+/* Schuine lijn (-28°) als beeldelement uit het merkboek */
+.admin-main::before {
+    content: '';
+    position: absolute;
+    top: -1.5rem;
+    right: 3rem;
+    width: 1px;
+    height: 6rem;
+    background: var(--admin-ink);
+    transform: rotate(28deg);
+    transform-origin: top;
+}
+
+.admin-page-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.admin-page-heading h1 { margin-bottom: 0.25rem; }
+.admin-page-heading p { margin: 0; color: var(--admin-muted); }
+
+.admin-muted { color: var(--admin-muted); font-size: 0.9rem; }
+
+.admin-back {
+    display: inline-block;
+    margin-bottom: 1rem;
+    color: var(--admin-muted);
+    text-decoration: none;
+}
+
+.admin-back:hover { text-decoration: underline; }
+
+/* Knoppen: strak en zwart, zoals in het websitevoorbeeld */
+.admin-button {
+    display: inline-block;
+    padding: 0.75rem 1.4rem;
+    border: 1px solid var(--admin-ink);
+    border-radius: 0;
+    background: var(--admin-ink);
+    color: var(--admin-paper) !important;
+    font: inherit;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.admin-button:hover { background: #000; }
+
+.admin-button:focus-visible,
+.admin-link-button:focus-visible,
+.admin a:focus-visible {
+    outline: 3px solid #4a7bd0;
+    outline-offset: 2px;
+}
+
+.admin-button--secondary {
+    background: var(--admin-paper);
+    color: var(--admin-ink) !important;
+}
+
+.admin-button--secondary:hover { background: var(--admin-grey); }
+
+.admin-button--danger {
+    border-color: var(--admin-error);
+    background: var(--admin-paper);
+    color: var(--admin-error) !important;
+}
+
+.admin-button--danger:hover { background: var(--admin-error); color: var(--admin-paper) !important; }
+
+.admin-button--small { padding: 0.45rem 0.85rem; font-size: 0.875rem; }
+
+/* Meldingen */
+.admin-alert {
+    margin: 0 0 1.75rem;
+    padding: 0.9rem 1.1rem;
+    border-left: 4px solid;
+}
+
+.admin-alert--success { border-color: var(--admin-success); background: #eaf4ee; color: var(--admin-success); }
+.admin-alert--error { border-color: var(--admin-error); background: #fbecec; color: var(--admin-error); }
+
+/* Tabel */
+.admin-table-wrapper { overflow-x: auto; }
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 0.9rem 0.75rem;
+    border-bottom: 1px solid var(--admin-line);
+    text-align: left;
+    vertical-align: middle;
+}
+
+.admin-table th {
+    color: var(--admin-muted);
+    font-size: 0.8rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.admin-table tbody tr:hover { background: #f6f6f6; }
+
+.admin-table__actions {
+    text-align: right !important;
+    white-space: nowrap;
+}
+
+.admin-table__actions form {
+    display: inline-block;
+    margin: 0 0 0 0.4rem;
+}
+
+/* Lege toestand */
+.admin-empty {
+    padding: 3rem 1.5rem;
+    background: var(--admin-grey);
+    text-align: center;
+}
+
+.admin-empty p { margin: 0 0 1.5rem; color: var(--admin-muted); }
+
+/* Formulier */
+.admin-form { max-width: 720px; }
+
+.admin-field { margin-bottom: 1.5rem; }
+
+.admin-field-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 1.5rem;
+}
+
+.admin-field label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 700;
+}
+
+.admin-required { color: var(--admin-error); }
+
+.admin-field input,
+.admin-field select,
+.admin-field textarea {
+    display: block;
+    width: 100%;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid #8d9092;
+    border-radius: 0;
+    background: var(--admin-paper);
+    color: var(--admin-ink);
+    font: inherit;
+}
+
+.admin-field textarea { resize: vertical; }
+
+.admin-field input:focus,
+.admin-field select:focus,
+.admin-field textarea:focus {
+    border-color: var(--admin-ink);
+    outline: 2px solid var(--admin-ink);
+    outline-offset: 0;
+}
+
+.admin-field [aria-invalid='true'] { border-color: var(--admin-error); }
+
+.admin-hint { margin: 0.35rem 0 0; color: var(--admin-muted); font-size: 0.875rem; }
+
+.admin-error { margin: 0.35rem 0 0; color: var(--admin-error); font-size: 0.9rem; }
+
+.admin-form__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--admin-line);
+}
+
+@media (max-width: 700px) {
+    .admin-main { margin: 0; }
+    .admin-main::before { display: none; }
+    .admin-field-row { grid-template-columns: 1fr; }
+    .admin-nav { order: 3; flex-basis: 100%; }
+
+    .admin-table thead { display: none; }
+    .admin-table tr { display: block; padding: 0.75rem 0; border-bottom: 1px solid var(--admin-line); }
+    .admin-table td { display: block; padding: 0.15rem 0; border: 0; }
+    .admin-table__actions { text-align: left !important; margin-top: 0.5rem; }
+}
