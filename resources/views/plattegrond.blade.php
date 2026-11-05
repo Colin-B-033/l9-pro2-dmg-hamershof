@@ -4,18 +4,16 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Plattegrond · De Hamershof</title>
+    @vite('resources/css/app.css')
     <link rel="stylesheet" href="{{ asset('css/plattegrond.css') }}">
     <script src="{{ asset('js/plattegrond.js') }}" defer></script>
 </head>
-<body class="design-page">
+<body class="site-layout plattegrond-page">
     <a class="skip" href="#main">Naar de winkels</a>
-    <header class="design-header">
-        <a class="brand" href="/home">de <em>Hamershof</em><small>winkelen in het hart van Leusden</small></a>
-        <a href="/home">Terug naar home ↗</a>
-    </header>
+    @include('nav')
 <main id="main" class="design-main">
         <section class="hero">
-            <div><p class="eyebrow">ONTDEK DE HAMERSHOF · LEUSDEN</p><h1>Vind jouw winkel.</h1>
+            <div><h1>Plattegrond</h1>
             <p class="intro">Van je dagelijkse boodschappen tot iets bijzonders. Zoek je winkel en ontdek waar je moet zijn.</p></div>
             <div class="search-box">
                 <label for="shop-search">Welke winkel zoek je?</label>
@@ -40,7 +38,7 @@
                 <div class="no-results" hidden><h3>Geen winkel gevonden</h3><p>Probeer een andere naam of een winkelnummer.</p><button type="button" id="reset-search">Toon alle winkels</button></div>
             </section>
         </div>
-        <section class="visit-note"><p class="eyebrow">MAAK ER EEN FIJN BEZOEK VAN</p><h2>Even de tijd voor Leusden.</h2><p>Je favoriete winkels, een gezellige tussenstop en alles voor elke dag. Welkom in De Hamershof.</p><a href="/home">Terug naar home →</a></section>
+        <section class="plattegrond-outro"><p class="eyebrow">MAAK ER EEN FIJN BEZOEK VAN</p><h2>Even de tijd voor Leusden.</h2><p>Je favoriete winkels, een gezellige tussenstop en alles voor elke dag. Welkom in De Hamershof.</p><a href="/home">Terug naar home →</a></section>
     </main>
     @include('footer')
     <dialog id="map-dialog" aria-labelledby="dialog-title"><div class="dialog-bar"><div><h2 id="dialog-title">De Hamershof</h2><p id="dialog-selected">Kies een winkel op de kaart.</p></div><button id="close-map" type="button">Sluiten ×</button></div><div class="dialog-map"></div><div class="zoom-controls"><button type="button" data-zoom="in" aria-label="Inzoomen">+</button><button type="button" data-zoom="out" aria-label="Uitzoomen">−</button><button type="button" data-zoom="reset">Hele kaart</button></div><p class="dialog-hint">Gebruik + en − om te vergroten. Scroll om de vergrote kaart te bekijken.</p></dialog>

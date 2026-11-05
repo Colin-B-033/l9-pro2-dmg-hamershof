@@ -42,3 +42,11 @@ Route::get('/tehuur', function () {
     return view('tehuur');
 });
 
+Route::get('/plattegrond', function () {
+    return view('plattegrond', ['shops' => config('map-shops')]);
+});
+
+Route::get('/agenda', function () {
+    return view('agenda');
+});
+
