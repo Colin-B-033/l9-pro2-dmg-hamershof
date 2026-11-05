@@ -46,7 +46,7 @@
                 ] as $store)
                     <article class="store-card" id="{{ $store[0] }}">
                         <div class="store-card__image store-card__image--{{ $store[1] }}">
-                            <video autoplay muted loop playsinline aria-hidden="true"><source src="{{ Vite::asset('resources/assets/Home.mp4') }}" type="video/mp4"></video>
+                            <img src="{{ Vite::asset('resources/assets/steen.png') }}" alt="">
                         </div>
                         <div class="store-card__body">
                             <span>{{ $store[3] }}</span>
