@@ -27,7 +27,7 @@ Route::get('/home', function () {
     return view('home');
 });
 
-Route::get('/winkels', function () {
+Route::get('/stores', function () {
     return view('stores');
 });
 
@@ -41,3 +41,4 @@ Route::get('/bezoekons', function () {
 Route::get('/tehuur', function () {
     return view('tehuur');
 });
+

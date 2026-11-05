@@ -21,14 +21,13 @@
 		</a>
 
 		<nav aria-label="Hoofdnavigatie">
-			<a href="/">Home</a>
+			<a href="/home">Home</a>
 			<a href="/tehuur">Te Huur</a>
 			<a href="/plattegrond">Plattegrond</a>
-			<a href="/nieuws">Evenementen</a>
+			<a href="/events">Events</a>
 			<a href="/agenda">Agenda</a>
-			<a href="/markten">Winkels</a>
-			<a href="/hamershofbon">Bezoek ons</a>
-			<a href="/contact">Contact</a>
+			<a href="/stores">Winkels</a>
+			<a href="/bezoekons">Bezoek ons</a>
 		</nav>
 
 		<a class="site-navigation__login" href="/login">
