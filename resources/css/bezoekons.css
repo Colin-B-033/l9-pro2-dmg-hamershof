@@ -67,37 +67,60 @@
 	color: #555;
 }
 
+/* Contactkaartjes (Adres / Contact / Openingstijden) */
 .visit-contact-grid {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	gap: 20px;
 	width: 82%;
 	margin: 32px auto 0;
-	text-align: center;
+	text-align: left;
 }
 
 .visit-contact-grid article {
 	min-width: 0;
+	padding: 22px 20px 24px;
+	background: #f8f9fb;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 
-.visit-contact-grid .visit-icon {
+.visit-contact-grid box-icon {
 	display: block;
-	font-size: 40px;
-	line-height: 1;
+	width: 24px;
+	height: 24px;
+	margin-bottom: 14px;
 }
 
-.visit-contact-grid h2,
-.visit-service h3 {
-	margin: 12px 0 7px;
+.visit-contact-grid h2 {
+	margin: 0 0 10px;
+	font-family: 'Playfair Display', Georgia, serif;
 	font-size: 18px;
-	font-weight: 700;
+	font-weight: 600;
+	color: #171717;
 }
 
 .visit-contact-grid p {
 	margin: 0;
-	color: #777;
-	font-size: 15px;
+	color: #444;
+	font-size: 14px;
 	line-height: 1.5;
+}
+
+.visit-contact-grid p+p {
+	margin-top: 8px;
+}
+
+.visit-contact-grid strong {
+	font-family: 'Playfair Display', Georgia, serif;
+	font-size: 13px;
+	font-weight: 600;
+	color: #333;
+}
+
+.visit-service h3 {
+	margin: 12px 0 7px;
+	font-size: 18px;
+	font-weight: 700;
 }
 
 .visit-hours {
@@ -285,14 +308,6 @@
 		margin-top: 32px;
 	}
 
-	.visit-contact-grid h2 {
-		font-size: 18px;
-	}
-
-	.visit-contact-grid p {
-		font-size: 15px;
-	}
-
 	.visit-hours {
 		margin-top: 80px;
 		padding: 20px 24px 18px;
@@ -360,20 +375,19 @@
 	}
 }
 
+/* Kaart over de volle breedte */
 .mapcontainer {
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	width: 100%;
+	display: block;
+	margin-top: 40px;
 }
 
 .mapcontainer iframe {
-	padding: 30px;
-	width: 750px;
+	display: block;
+	width: 100%;
 	height: 500px;
-	max-width: 100%;
-	width: min(600px, 100%);
-	height: auto;
-	aspect-ratio: 4 / 3;
+	border: 0;
+	padding: 0;
 }
 
 @media (max-width: 700px) {
@@ -389,25 +403,18 @@
 		font-size: 0.9rem;
 	}
 
-	.mapcontainer {
-		padding: 0 1rem;
+	.mapcontainer iframe {
+		height: 350px;
 	}
 
-	.visit-contact-grid,
+	.visit-contact-grid {
+		grid-template-columns: 1fr;
+		width: calc(100% - 2rem);
+	}
+
 	.visit-service-grid {
 		grid-template-columns: 1fr;
 		width: 100%;
-	}
-
-	.visit-contact-grid article {
-		min-height: 0;
-		padding: 1.25rem 1.5rem;
-		border-right: 0;
-		border-bottom: 1px solid #eee;
-	}
-
-	.visit-contact-grid article:last-child {
-		border-bottom: 0;
 	}
 
 	.visit-hours,

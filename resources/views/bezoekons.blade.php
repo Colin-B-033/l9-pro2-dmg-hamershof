@@ -14,25 +14,25 @@
 			<p>Kom langs en ontdek alles wat we te bieden hebben!</p>
 		</header>
 		<div class="mapcontainer">
-			<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2449.297371758489!2d5.42489277616745!3d52.12891196511154!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c645b8b821cce9%3A0x4a39a271140d0e0b!2sWinkelcentrum%20de%20Hamershof%20%F0%9F%9B%8D!5e0!3m2!1snl!2snl!4v1790846115879!5m2!1snl!2snl" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+			<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2449.297371758489!2d5.42489277616745!3d52.12891196511154!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47c645b8b821cce9%3A0x4a39a271140d0e0b!2sWinkelcentrum%20de%20Hamershof%20%F0%9F%9B%8D!5e0!3m2!1snl!2snl!4v1790846115879!5m2!1snl!2snl" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>
 		</div>
-
 
 		<section class="visit-contact-grid" aria-label="Contactgegevens">
 			<article>
-				<span class="visit-icon" aria-hidden="true">&#9742;</span>
+				<box-icon name='map-pin' size='md' color='#171717'></box-icon>
 				<h2>Adres</h2>
-				<p>Hamershof 1<br>3831 AA Leusden</p>
+				<p>Hamershof 1<br>3831 AA Leusden<br>Nederland</p>
 			</article>
 			<article>
-				<span class="visit-icon" aria-hidden="true">&#9993;</span>
+				<box-icon name='phone' size='md' color='#171717'></box-icon>
 				<h2>Contact</h2>
-				<p>info@hamershof.nl<br>033 - 494 12 00</p>
+				<p><strong>Telefoon:</strong><br>033 - 494 12 00</p>
+				<p><strong>Email:</strong><br>info@hamershof.nl</p>
 			</article>
 			<article>
-				<span class="visit-icon" aria-hidden="true">&#9678;</span>
+				<box-icon name='time' size='md' color='#171717'></box-icon>
 				<h2>Openingstijden</h2>
-				<p>Ma - Za: 09:00 - 18:00<br>Zo: 12:00 - 17:00</p>
+				<p>Ma - Do: 09:00 - 18:00<br>Vr: 09:00 - 21:00<br>Za: 09:00 - 17:00<br>Zo: 12:00 - 17:00</p>
 			</article>
 		</section>
 
@@ -76,8 +76,8 @@
 				<button type="submit">Verstuur bericht</button>
 			</form>
 		</section>
-        <script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
+		<script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
 	</main>
-    @include('footer')
+	@include('footer')
 </body>
 </html>
