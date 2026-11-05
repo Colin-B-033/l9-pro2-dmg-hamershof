@@ -11,6 +11,40 @@
     margin: 0;
 }
 
+.home-hero__lines{
+    .home-hero__lines {
+  position: relative;      /* or absolute, wherever the SVG was placed */
+  width: 279px;
+  height: 508px;
+  pointer-events: none;
+}
+
+.home-hero__lines::before,
+.home-hero__lines::after {
+  content: "";
+  position: absolute;
+  height: 5px;
+  background: #fff;
+  transform-origin: 0 50%;   /* rotate around the line's start point */
+}
+
+/* line 1: (231.729, 84.915) → (276.255, 1.174) */
+.home-hero__lines::before {
+  left: 231.729px;
+  top: calc(84.915px - 2.5px);   /* center the 5px bar on the start point */
+  width: 94.84px;                /* line length */
+  transform: rotate(-62deg);
+}
+
+/* line 2: (2.207, 506.492) → (49.152, 418.202) */
+.home-hero__lines::after {
+  left: 2.207px;
+  top: calc(506.492px - 2.5px);
+  width: 100px;
+  transform: rotate(-62deg);
+}
+}
+
 .site-layout {
     display: flex;
     flex-direction: column;

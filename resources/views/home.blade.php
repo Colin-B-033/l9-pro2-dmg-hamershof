@@ -19,9 +19,10 @@
         <line x1="231.729" y1="84.9149" x2="276.255" y2="1.17367" stroke="white" stroke-width="5"></line>
         <path d="M2.2074 506.492L49.152 418.202" stroke="white" stroke-width="5"></path>
     </svg>
-
+	</div class="home-hero__lines">
     <h1 id="home-title">Alles op één plek</h1>
     <p class="home-hero__intro">Het winkelcentrum van Hamershof waar winkelen, wonen, werken, boodschappen doen, recreëren, cultuur, educatie en leisure samenkomen.</p>
+	<div>
 </div>
 		</section>
 
