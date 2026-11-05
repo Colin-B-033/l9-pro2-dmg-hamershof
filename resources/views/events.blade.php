@@ -43,9 +43,7 @@
 				] as $event)
 					<article class="event-card">
 						<div class="event-card__visual event-card__visual--{{ $event[5] }}">
-							<video autoplay muted loop playsinline aria-hidden="true">
-								<source src="{{ Vite::asset('resources/assets/Home.mp4') }}" type="video/mp4">
-							</video>
+							<img src="{{ Vite::asset('resources/assets/oudemensen.png') }}" alt="">
 							<time datetime="2026-03-{{ $event[0] }}"><span>MAART</span>{{ $event[0] }}</time>
 							<b>GRATIS</b>
 						</div>

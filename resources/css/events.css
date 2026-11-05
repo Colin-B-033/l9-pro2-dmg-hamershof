@@ -127,7 +127,7 @@ body.events-page {
 	background: #d9d9d9;
 }
 
-.event-card__visual video {
+.event-card__visual img {
 	width: 100%;
 	height: 100%;
 	display: block;
@@ -136,11 +136,11 @@ body.events-page {
 	filter: saturate(.9) contrast(.94);
 }
 
-.event-card__visual--family video { object-position: 18% center; }
-.event-card__visual--food video { object-position: 78% center; }
-.event-card__visual--music video { object-position: 38% center; }
-.event-card__visual--market video { object-position: 64% center; }
-.event-card__visual--wellness video { object-position: 90% center; }
+.event-card__visual--family img { object-position: 18% center; }
+.event-card__visual--food img { object-position: 78% center; }
+.event-card__visual--music img { object-position: 38% center; }
+.event-card__visual--market img { object-position: 64% center; }
+.event-card__visual--wellness img { object-position: 90% center; }
 
 .event-card__visual time {
 	position: absolute;
