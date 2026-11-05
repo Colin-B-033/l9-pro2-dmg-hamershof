@@ -94,16 +94,16 @@
     overflow: hidden;
 }
 
-.store-card__image video {
+.store-card__image img {
     height: 100%;
     object-fit: cover;
     width: 100%;
 }
 
-.store-card__image--mode video { object-position: 15% center; }
-.store-card__image--supermarkten video { object-position: 50% center; }
-.store-card__image--eten video { object-position: 85% center; }
-.store-card__image--diensten video { object-position: 35% center; }
+.store-card__image--mode img { object-position: 15% center; }
+.store-card__image--supermarkten img { object-position: 50% center; }
+.store-card__image--eten img { object-position: 85% center; }
+.store-card__image--diensten img { object-position: 35% center; }
 
 .store-card__body {
     padding: 0.4375rem 0.5625rem 0.525rem;
