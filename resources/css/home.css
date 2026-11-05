@@ -11,8 +11,8 @@
     margin: 0;
 }
 
-.home-hero__lines{
-    .home-hero__lines {
+
+.home-hero__lines {
   position: relative;      /* or absolute, wherever the SVG was placed */
   width: 279px;
   height: 508px;
@@ -31,7 +31,6 @@
 /* line 1: (231.729, 84.915) → (276.255, 1.174) */
 .home-hero__lines::before {
   left: 231.729px;
-  top: calc(84.915px - 2.5px);   /* center the 5px bar on the start point */
   width: 94.84px;                /* line length */
   transform: rotate(-62deg);
 }
@@ -39,11 +38,11 @@
 /* line 2: (2.207, 506.492) → (49.152, 418.202) */
 .home-hero__lines::after {
   left: 2.207px;
-  top: calc(506.492px - 2.5px);
+  top: calc(526.492px - 10.5px);
   width: 100px;
   transform: rotate(-62deg);
 }
-}
+
 
 .site-layout {
     display: flex;
@@ -85,7 +84,7 @@
 .home-hero__content {
     padding: clamp(3rem, 9vw, 8rem) 7vw clamp(3.5rem, 9vw, 7rem);
     margin-left: auto;
-    width: min(100%, 800px);
+    width: min(100%, 600px);
 }
 
 .home-hero__eyebrow,
@@ -99,7 +98,7 @@
 
 .home-hero h1 {
     font-family: Georgia, 'Times New Roman', serif;
-    font-size: clamp(3.2rem, 8vw, 7.2rem);
+    font-size: 80px;
     font-weight: 400;
     line-height: 0.9;
     margin: 0 0 1.5rem;
