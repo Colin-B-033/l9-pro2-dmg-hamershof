@@ -36,5 +36,5 @@ Route::get('/events', function () {
 });
 
 Route::get('/bezoekons', function () {
-    return view('bezoekons');
+    return view('bezoekons');   
 });
