@@ -15,16 +15,16 @@
 .rent-card__image::before, .rent-card__image::after { position: absolute; content: ''; }
 .rent-card__image--winkel { background: linear-gradient(145deg, #766c54 0 20%, #d8d3c3 21% 37%, #817154 38% 51%, #262621 52% 100%); }
 .rent-card__image--winkel::before { inset: 40px 18px 0; background: repeating-linear-gradient(90deg, #544a3a 0 12px, #e7e3d9 12px 18px); box-shadow: 0 -28px 0 #1a1c18; }
-.rent-card__image--winkel::after { width: 55px; height: 14px; top: 9px; left: 10px; background: #56b979; border-radius: 10px; }
+.rent-card__image--winkel::after { width: 55px; height: 14px; top: 9px; left: 10px;  border-radius: 10px; }
 .rent-card__image--horeca { background: linear-gradient(130deg, #201911, #9a8062 43%, #2d261b 44% 58%, #766044); }
 .rent-card__image--horeca::before { inset: 27px 18px 0; background: repeating-linear-gradient(90deg, #1c1811 0 13px, #bd9c6d 13px 17px); transform: perspective(100px) rotateX(10deg); }
-.rent-card__image--horeca::after { width: 55px; height: 14px; top: 9px; right: 10px; background: #56b979; border-radius: 10px; }
+.rent-card__image--horeca::after { width: 55px; height: 14px; top: 9px; right: 10px; border-radius: 10px; }
 .rent-card__image--retail { background: linear-gradient(160deg, #4f8ce5 0 55%, #2e5da3 56% 100%); }
 .rent-card__image--retail::before { width: 75%; height: 68%; right: 10%; bottom: -3px; background: #d1d2d4; box-shadow: 0 16px 0 #9da0a7; transform: skewY(-10deg); }
-.rent-card__image--retail::after { width: 55px; height: 14px; top: 9px; right: 10px; background: #f2a51c; border-radius: 10px; }
+.rent-card__image--retail::after { width: 55px; height: 14px; top: 9px; right: 10px; border-radius: 10px; }
 .rent-card__image--winkelplein { background: radial-gradient(circle at 50% 55%, #a87d43 0 4%, transparent 5%), linear-gradient(145deg, #726047, #3a3025 50%, #191715); }
 .rent-card__image--winkelplein::before { inset: 42px 8px 0; background: radial-gradient(circle, #d7b272 0 4px, transparent 5px) 0 0 / 34px 28px, linear-gradient(#4e4233, #211c17); }
-.rent-card__image--winkelplein::after { width: 55px; height: 14px; top: 9px; right: 10px; background: #56b979; border-radius: 10px; }
+.rent-card__image--winkelplein::after { width: 55px; height: 14px; top: 9px; right: 10px; border-radius: 10px; }
 .rent-card__image span { position: absolute; z-index: 1; top: 11px; left: 12px; color: #fff; font-size: 9px; }
 .rent-card__image--horeca span, .rent-card__image--retail span, .rent-card__image--winkelplein span { left: auto; right: 12px; }
 .rent-card__body { padding-top: 8px; }

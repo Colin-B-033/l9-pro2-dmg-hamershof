@@ -23,7 +23,6 @@
 			<div class="rent-card-grid">
 				<article class="rent-card">
 					<div class="rent-card__image rent-card__image--winkel">
-						<span>Beschikbaar</span>
 					</div>
 					<div class="rent-card__body">
 						<h3>Ruime Winkelunit Centrum</h3>
@@ -34,7 +33,6 @@
 				</article>
 				<article class="rent-card">
 					<div class="rent-card__image rent-card__image--horeca">
-						<span>Beschikbaar</span>
 					</div>
 					<div class="rent-card__body">
 						<h3>Horecapand met Uitstraling</h3>
@@ -45,7 +43,6 @@
 				</article>
 				<article class="rent-card">
 					<div class="rent-card__image rent-card__image--retail">
-						<span>Beschikbaar</span>
 					</div>
 					<div class="rent-card__body">
 						<h3>Compacte Retail Space</h3>
@@ -56,7 +53,6 @@
 				</article>
 				<article class="rent-card">
 					<div class="rent-card__image rent-card__image--winkelplein">
-						<span>Beschikbaar</span>
 					</div>
 					<div class="rent-card__body">
 						<h3>Premium Winkelruimte</h3>
@@ -94,23 +90,24 @@
 			<h2 id="benefits-title">Waarom Hamershof?</h2>
 			<div class="rent-benefits__grid">
 				<article>
-					<span class="rent-benefit-icon" aria-hidden="true">◉</span>
+					<span class="rent-benefit-icon" aria-hidden="true"><box-icon name='map'></box-icon></span>
 					<h3>Toplocatie</h3>
-					<p>Centrale ligging met veel bezoekers en een uitstekende bereikbaarheid.</p>
+					<p>Centraal gelegen in Leusden met uistekende bereikbaarheid en ruim 500 parkeerplaatsen.</p>
 				</article>
 				<article>
-					<span class="rent-benefit-icon" aria-hidden="true">⌂</span>
-					<h3>Royale Voetbal</h3>
-					<p>Profiteer van de levendige sfeer en de vele bezoekers van het winkelcentrum.</p>
+					<span class="rent-benefit-icon" aria-hidden="true"><box-icon name='line-chart'></box-icon></span>
+					<h3>High Footfall</h3>
+					<p>Dagelijks bezoeken duizenden klanten ons winkelcentrum voor hun dagelijkse boodschappen en winkelen.</p>
 				</article>
 				<article>
-					<span class="rent-benefit-icon" aria-hidden="true">♧</span>
-					<h3>Flexibele Mix</h3>
-					<p>Een gevarieerd aanbod van winkels, horeca en dienstverlening om je heen.</p>
+					<span class="rent-benefit-icon" aria-hidden="true"><box-icon type='solid' name='color'></box-icon></span>
+					<h3>Diverse Mix</h3>
+					<p>Een gevarieerde mix van winkels, restaurants en diensten zorgt voor een aantrekkelijk winkelklimaat.</p>
 				</article>
 			</div>
 		</section>
 	</main>
+	<script src="https://unpkg.com/boxicons@2.1.4/dist/boxicons.js"></script>
 	@include('footer')
 </body>
 </html>
