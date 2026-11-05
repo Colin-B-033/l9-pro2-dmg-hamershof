@@ -6,14 +6,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return view('home');
-})->name('home');
+// Homepage met maximaal drie zichtbare, uitgelichte winkels (alfabetisch).
+$homePage = function () {
+    $featuredStores = Store::visible()
+        ->where('is_featured', true)
+        ->orderBy('name')
+        ->limit(3)
+        ->get();
 
-// Oude adres van de homepage blijft werken.
-Route::get('/home', function () {
-    return view('home');
-});
+    return view('home', ['featuredStores' => $featuredStores]);
+};
+
+Route::get('/', $homePage)->name('home');
+
+// Oude adres van de homepage blijft werken, met precies hetzelfde gedrag.
+Route::get('/home', $homePage);
 
 Route::middleware([
     'auth:sanctum',
@@ -37,7 +44,7 @@ Route::get('/winkels', function (Request $request) {
         $category = null;
     }
 
-    $stores = Store::query()
+    $stores = Store::visible()
         ->when($category, fn ($query) => $query->where('category', $category))
         ->orderBy('name')
         ->get();

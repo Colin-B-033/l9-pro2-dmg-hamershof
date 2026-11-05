@@ -244,6 +244,59 @@ body.admin {
     margin: 0 0 0 0.4rem;
 }
 
+/* Zichtbaarheid en uitgelicht in de tabel */
+.admin-status {
+    display: inline-block;
+    margin: 0.1rem 0.25rem 0.1rem 0;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid var(--admin-ink);
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.admin-status--hidden {
+    border-style: dashed;
+    border-color: var(--admin-muted);
+    color: var(--admin-muted);
+}
+
+.admin-status--featured {
+    background: var(--admin-ink);
+    color: var(--admin-paper);
+}
+
+.admin-table tr.is-hidden td:not(.admin-table__actions) { color: var(--admin-muted); }
+
+/* Zoeken */
+.admin-search { margin: 0 0 2rem; }
+
+.admin-search label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-weight: 700;
+}
+
+.admin-search__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.admin-search input {
+    flex: 1 1 16rem;
+    max-width: 28rem;
+    padding: 0.7rem 0.8rem;
+    border: 1px solid #8d9092;
+    border-radius: 0;
+    font: inherit;
+}
+
+.admin-search input:focus {
+    border-color: var(--admin-ink);
+    outline: 2px solid var(--admin-ink);
+    outline-offset: 0;
+}
+
 /* Lege toestand */
 .admin-empty {
     padding: 3rem 1.5rem;
@@ -271,6 +324,36 @@ body.admin {
 }
 
 .admin-required { color: var(--admin-error); }
+
+/* Checkboxes voor zichtbaarheid en uitlichten */
+.admin-fieldset {
+    margin: 0.5rem 0 0;
+    padding: 1.25rem 1.25rem 0.5rem;
+    border: 1px solid var(--admin-line);
+}
+
+.admin-fieldset legend {
+    padding: 0 0.4rem;
+    font-family: var(--admin-serif);
+    font-size: 1.2rem;
+}
+
+.admin-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.admin-checkbox input[type='checkbox'] {
+    width: 1.25rem;
+    height: 1.25rem;
+    margin: 0;
+    accent-color: var(--admin-ink);
+}
+
+.admin-checkbox label { font-weight: 700; }
+
+.admin-fieldset .admin-hint { margin: 0.25rem 0 1.1rem 1.85rem; }
 
 .admin-field input,
 .admin-field select,

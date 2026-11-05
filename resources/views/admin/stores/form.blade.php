@@ -74,6 +74,25 @@
             </div>
         </div>
 
+        {{-- Het verborgen veld zorgt dat een uitgevinkte checkbox als "0" wordt verstuurd. --}}
+        <fieldset class="admin-fieldset">
+            <legend>Weergave</legend>
+
+            <div class="admin-checkbox">
+                <input type="hidden" name="is_visible" value="0">
+                <input type="checkbox" id="is_visible" name="is_visible" value="1" @checked(old('is_visible', $store->is_visible))>
+                <label for="is_visible">Zichtbaar op de website</label>
+            </div>
+            <p class="admin-hint">Uitgevinkt: de winkel blijft in het beheer staan, maar is niet te zien op /winkels en de homepage.</p>
+
+            <div class="admin-checkbox">
+                <input type="hidden" name="is_featured" value="0">
+                <input type="checkbox" id="is_featured" name="is_featured" value="1" @checked(old('is_featured', $store->is_featured))>
+                <label for="is_featured">Uitlichten op de homepage</label>
+            </div>
+            <p class="admin-hint">De homepage toont maximaal drie zichtbare, uitgelichte winkels, op alfabetische volgorde.</p>
+        </fieldset>
+
         <div class="admin-form__actions">
             <button type="submit" class="admin-button">{{ $store->exists ? 'Wijzigingen opslaan' : 'Winkel toevoegen' }}</button>
             <a class="admin-button admin-button--secondary" href="{{ route('admin.stores.index') }}">Annuleren</a>

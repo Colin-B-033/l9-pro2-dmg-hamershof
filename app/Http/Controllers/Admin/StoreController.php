@@ -13,11 +13,22 @@ use Illuminate\Validation\Rule;
  */
 class StoreController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $stores = Store::orderBy('name')->get();
+        // Zoeken op naam via ?zoek=... (ook verborgen winkels worden gevonden).
+        $search = $request->query('zoek');
+        $search = is_string($search) ? trim($search) : '';
 
-        return view('admin.stores.index', ['stores' => $stores]);
+        $stores = Store::query()
+            // whereLike zoekt standaard hoofdletterongevoelig en gebruikt een gebonden parameter.
+            ->when($search !== '', fn ($query) => $query->whereLike('name', "%{$search}%"))
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.stores.index', [
+            'stores' => $stores,
+            'search' => $search,
+        ]);
     }
 
     public function create()
@@ -68,6 +79,8 @@ class StoreController extends Controller
             // Alleen http(s)-adressen, zodat er geen javascript:-links in de site komen.
             'website' => ['nullable', 'url:http,https', 'max:255'],
             'phone' => ['nullable', 'string', 'max:30', 'regex:/^[0-9+\-\s()]+$/'],
+            'is_visible' => ['boolean'],
+            'is_featured' => ['boolean'],
         ];
 
         $messages = [
@@ -76,6 +89,7 @@ class StoreController extends Controller
             'in' => 'Kies een geldige categorie.',
             'url' => 'Vul een volledig webadres in, bijvoorbeeld https://www.voorbeeld.nl.',
             'phone.regex' => 'Een telefoonnummer mag alleen cijfers, spaties en + - ( ) bevatten.',
+            'boolean' => 'Ongeldige keuze bij :attribute.',
         ];
 
         $attributes = [
@@ -85,8 +99,17 @@ class StoreController extends Controller
             'location' => 'locatie',
             'website' => 'website',
             'phone' => 'telefoonnummer',
+            'is_visible' => 'zichtbaar op de website',
+            'is_featured' => 'uitlichten op de homepage',
         ];
 
-        return $request->validate($rules, $messages, $attributes);
+        $data = $request->validate($rules, $messages, $attributes);
+
+        // Checkboxes: het formulier stuurt "0" (verborgen veld) of "1" (aangevinkt).
+        // $request->boolean() maakt daar altijd true of false van, dus uitvinken wordt echt false.
+        $data['is_visible'] = $request->boolean('is_visible');
+        $data['is_featured'] = $request->boolean('is_featured');
+
+        return $data;
     }
 }

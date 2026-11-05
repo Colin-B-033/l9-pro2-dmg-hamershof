@@ -131,16 +131,24 @@
 					</div>
 				</article>
 			</div>
-			<section class="home-featured" aria-labelledby="featured-title">
-				<div class="home-section-heading"><h2 id="featured-title">Uitgelichte Winkels</h2></div>
-				<div class="featured-grid">
-					@foreach ([['Mode', 'Fashion District', 'Trendy kleding voor jong en oud', '15:00', 'fashion'], ['Horeca', 'Café Central', 'De beste koffie in de buurt', '18:00', 'cafe'], ['Restaurant', 'Restaurant Plaza', 'Internationale gerechten', '24:00', 'restaurant']] as $place)
-						<article class="place-card place-card--{{ $place[4] }}">
-							<div class="place-card__image"><video autoplay muted loop playsinline aria-hidden="true"><source src="{{ Vite::asset('resources/assets/Home.mp4') }}" type="video/mp4"></video></div>
-							<div class="place-card__body"><span class="place-card__tag">{{ $place[0] }}</span><p class="place-card__hours">OPEN til {{ $place[3] }}</p><h3>{{ $place[1] }}</h3><p>{{ $place[2] }}</p></div>
-						</article>
-					@endforeach
-				</div>
+			<section class="home-featured" @if ($featuredStores->isNotEmpty()) aria-labelledby="featured-title" @endif>
+				{{-- Uitgelichte winkels komen uit het CMS. Zonder geschikte winkels wordt dit blok niet getoond. --}}
+				@if ($featuredStores->isNotEmpty())
+					<div class="home-section-heading"><h2 id="featured-title">Uitgelichte Winkels</h2></div>
+					<div class="featured-grid featured-grid--{{ $featuredStores->count() }}">
+						@foreach ($featuredStores as $store)
+							{{-- Bestaande kaartstijlen per positie: 1e, 2e en 3e kaart. --}}
+							<article class="place-card place-card--{{ ['fashion', 'cafe', 'restaurant'][$loop->index] }}">
+								<div class="place-card__image"><video autoplay muted loop playsinline aria-hidden="true"><source src="{{ Vite::asset('resources/assets/Home.mp4') }}" type="video/mp4"></video></div>
+								<div class="place-card__body">
+									<span class="place-card__tag">{{ $store->categoryLabel() }}</span>
+									<h3>{{ $store->name }}</h3>
+									<p>{{ \Illuminate\Support\Str::limit($store->description ?: ($store->location ?? ''), 90) }}</p>
+								</div>
+							</article>
+						@endforeach
+					</div>
+				@endif
 				<a class="home-button" href="{{ url('/winkels') }}">Bekijk Alle Winkels</a>
 			</section>
 		</section>

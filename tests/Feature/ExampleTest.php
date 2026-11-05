@@ -2,11 +2,14 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
+    // De homepage leest uitgelichte winkels uit de database, dus deze test heeft (de test)database nodig.
+    use RefreshDatabase;
+
     /**
      * A basic test example.
      */
