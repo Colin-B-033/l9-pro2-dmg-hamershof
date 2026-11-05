@@ -324,6 +324,12 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+/* Minder dan drie uitgelichte winkels: kaarten even breed houden en centreren. */
+@media (min-width: 701px) {
+    .featured-grid--1 { grid-template-columns: minmax(0, 20rem); justify-content: center; }
+    .featured-grid--2 { grid-template-columns: repeat(2, minmax(0, 20rem)); justify-content: center; }
+}
+
 .place-card,
 .event-card {
     border: 1px solid #333;
@@ -347,6 +353,15 @@
 .event-card__image video {
     height: 100%;
     object-fit: cover;
+    width: 100%;
+}
+
+/* Geüploade foto of logo van een uitgelichte winkel: niet bijsnijden. */
+.place-card__image--photo img {
+    background: #e6e7e8;
+    display: block;
+    height: 100%;
+    object-fit: contain;
     width: 100%;
 }
 

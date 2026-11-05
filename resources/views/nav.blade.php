@@ -34,10 +34,23 @@
 			<a href="/bezoekons">Bezoek ons</a>
 		</nav>
 
-		<a class="site-navigation__login" href="/login">
-			<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 7V4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1v-3M3 12h12M11 8l4 4-4 4" /></svg>
-			Winkelier Inloggen
-		</a>
+		{{-- Ingelogd? Dan naar het beheer (beheerder) of het eigen account, anders naar de login. --}}
+		@if (auth()->user()?->is_admin)
+			<a class="site-navigation__login" href="/admin">
+				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 7V4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1v-3M3 12h12M11 8l4 4-4 4" /></svg>
+				Naar beheer
+			</a>
+		@elseif (auth()->check())
+			<a class="site-navigation__login" href="/dashboard">
+				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 7V4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1v-3M3 12h12M11 8l4 4-4 4" /></svg>
+				Mijn account
+			</a>
+		@else
+			<a class="site-navigation__login" href="/login">
+				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 7V4a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1v-3M3 12h12M11 8l4 4-4 4" /></svg>
+				Winkelier Inloggen
+			</a>
+		@endif
 
 		<div class="site-navigation__footer">
 			<div class="site-navigation__social">

@@ -15,48 +15,66 @@
             <p>Bekijk het volledige aanbod en vind jouw favoriete winkel.</p>
         </section>
 
+        {{-- Categorieën komen uit App\Models\Store::CATEGORIES --}}
         <nav class="stores-filter" aria-label="Winkelcategorieën">
-            <a href="#alle-winkels">Alle winkels</a>
-            <a href="#mode">Mode &amp; accessoires</a>
-            <a href="#supermarkten">Supermarkten</a>
-            <a href="#eten">Eten &amp; drinken</a>
-            <a href="#diensten">Diensten</a>
+            <a href="{{ route('stores') }}#alle-winkels" @class(['is-active' => ! $activeCategory])>Alle winkels</a>
+            @foreach (\App\Models\Store::CATEGORIES as $value => $label)
+                <a href="{{ route('stores', ['categorie' => $value]) }}#alle-winkels" @class(['is-active' => $activeCategory === $value])>{{ $label }}</a>
+            @endforeach
         </nav>
 
         <section class="stores-list" id="alle-winkels" aria-labelledby="stores-list-title">
             <div class="stores-list__heading">
                 <h2 id="stores-list-title">Vind jouw winkel</h2>
-                <span>50+ winkels en diensten</span>
+                <span>{{ $stores->count() }} {{ $stores->count() === 1 ? 'winkel' : 'winkels en diensten' }}</span>
             </div>
 
-            <div class="stores-grid">
-                @foreach ([
-                    ['mode', 'mode', 'Fashion District', 'Mode & accessoires', 'Vandaag open tot 18:00'],
-                    ['mode', 'mode', 'Shoeby', 'Mode & accessoires', 'Vandaag open tot 18:00'],
-                    ['mode', 'mode', 'Bristol', 'Mode & accessoires', 'Vandaag open tot 18:00'],
-                    ['supermarkten', 'supermarkten', 'Albert Heijn', 'Supermarkt', 'Vandaag open tot 20:00'],
-                    ['supermarkten', 'supermarkten', 'Jumbo', 'Supermarkt', 'Vandaag open tot 20:00'],
-                    ['supermarkten', 'supermarkten', 'Kruidvat', 'Drogisterij', 'Vandaag open tot 18:00'],
-                    ['eten', 'eten', 'Café Central', 'Horeca', 'Vandaag open tot 18:00'],
-                    ['eten', 'eten', 'Restaurant Plaza', 'Restaurant', 'Vandaag open tot 24:00'],
-                    ['eten', 'eten', 'Bakker Bart', 'Eten & drinken', 'Vandaag open tot 17:00'],
-                    ['diensten', 'diensten', 'Haarstudio Leusden', 'Persoonlijke verzorging', 'Vandaag open tot 18:00'],
-                    ['diensten', 'diensten', 'Etos Apotheek', 'Gezondheid', 'Vandaag open tot 18:00'],
-                    ['diensten', 'diensten', 'PostNL Punt', 'Dienstverlening', 'Vandaag open tot 18:00']
-                ] as $store)
-                    <article class="store-card" id="{{ $store[0] }}">
-                        <div class="store-card__image store-card__image--{{ $store[1] }}">
-                            <img src="{{ Vite::asset('resources/assets/steen.png') }}" alt="">
-                        </div>
-                        <div class="store-card__body">
-                            <span>{{ $store[3] }}</span>
-                            <h3>{{ $store[2] }}</h3>
-                            <p>{{ $store[4] }}</p>
-                            <a href="#contact">Bekijk winkel <span aria-hidden="true">&rarr;</span></a>
-                        </div>
-                    </article>
-                @endforeach
-            </div>
+            @if ($stores->isEmpty())
+                <div class="stores-empty">
+                    @if ($activeCategory)
+                        <p>Er zijn nog geen winkels in deze categorie.</p>
+                        <a href="{{ route('stores') }}#alle-winkels">Bekijk alle winkels</a>
+                    @else
+                        <p>Er zijn op dit moment nog geen winkels toegevoegd. Kom snel terug!</p>
+                    @endif
+                </div>
+            @else
+                <div class="stores-grid">
+                    @foreach ($stores as $store)
+                        <article class="store-card">
+                            {{-- Eigen afbeelding als die er is; anders de standaardfoto van de website. --}}
+                            @if ($store->imageUrl())
+                                <div class="store-card__image store-card__image--photo">
+                                    <img src="{{ $store->imageUrl() }}" alt="" loading="lazy">
+                                </div>
+                            @else
+                                <div class="store-card__image store-card__image--fallback store-card__image--{{ $store->category }}">
+                                    <img src="{{ Vite::asset('resources/assets/steen.png') }}" alt="">
+                                </div>
+                            @endif
+                            <div class="store-card__body">
+                                <span>{{ $store->categoryLabel() }}</span>
+                                <h3>{{ $store->name }}</h3>
+                                @if ($store->description)
+                                    <p>{{ \Illuminate\Support\Str::limit($store->description, 140) }}</p>
+                                @endif
+                                @if ($store->location)
+                                    <p class="store-card__meta">{{ $store->location }}</p>
+                                @endif
+                                @if ($store->opening_hours)
+                                    <p class="store-card__meta"><span class="store-card__label">Openingstijden:</span> {{ $store->opening_hours }}</p>
+                                @endif
+                                @if ($store->phone)
+                                    <p class="store-card__meta">Tel. {{ $store->phone }}</p>
+                                @endif
+                                @if ($store->website)
+                                    <a href="{{ $store->website }}" target="_blank" rel="noopener noreferrer">Bezoek website <span aria-hidden="true">&rarr;</span></a>
+                                @endif
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
+            @endif
         </section>
         @include('footer')
     </main>

@@ -1,34 +1,66 @@
 <?php
 
-use Illuminate\Foundation\Application;
+use App\Http\Controllers\Admin\StoreController;
+use App\Models\Store;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-});
+// Homepage met maximaal drie zichtbare, uitgelichte winkels (alfabetisch).
+$homePage = function () {
+    $featuredStores = Store::visible()
+        ->where('is_featured', true)
+        ->orderBy('name')
+        ->limit(3)
+        ->get();
+
+    return view('home', ['featuredStores' => $featuredStores]);
+};
+
+Route::get('/', $homePage)->name('home');
+
+// Het menu linkt naar /home; dat adres toont precies dezelfde homepage.
+Route::get('/home', $homePage);
 
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', function () {
+    Route::get('/dashboard', function (Request $request) {
+        // Beheerders gaan na het inloggen direct naar het CMS.
+        if ($request->user()->is_admin) {
+            return redirect()->route('admin.stores.index');
+        }
+
         return Inertia::render('Dashboard');
     })->name('dashboard');
 });
 
-Route::get('/home', function () {
-    return view('home');
-});
+// Openbare winkelpagina met de winkels uit het CMS.
+Route::get('/stores', function (Request $request) {
+    // Optioneel filter via ?categorie=mode; onbekende waarden worden genegeerd.
+    $category = $request->query('categorie');
+    if (! is_string($category) || ! isset(Store::CATEGORIES[$category])) {
+        $category = null;
+    }
 
-Route::get('/stores', function () {
-    return view('stores');
+    $stores = Store::visible()
+        ->when($category, fn ($query) => $query->where('category', $category))
+        ->orderBy('name')
+        ->get();
+
+    return view('stores', [
+        'stores' => $stores,
+        'activeCategory' => $category,
+    ]);
+})->name('stores');
+
+// Oud adres van de winkelpagina: doorsturen naar /stores (met hetzelfde categoriefilter).
+Route::get('/winkels', function (Request $request) {
+    $category = $request->query('categorie');
+
+    return redirect()->route('stores', is_string($category) ? ['categorie' => $category] : [], 301);
 });
 
 Route::get('/events', function () {
@@ -36,8 +68,9 @@ Route::get('/events', function () {
 });
 
 Route::get('/bezoekons', function () {
-    return view('bezoekons');   
+    return view('bezoekons');
 });
+
 Route::get('/tehuur', function () {
     return view('tehuur');
 });
@@ -50,3 +83,12 @@ Route::get('/agenda', function () {
     return view('agenda');
 });
 
+// CMS: alleen voor ingelogde beheerders (is_admin = true).
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::redirect('/', '/admin/winkels')->name('index');
+
+    Route::resource('winkels', StoreController::class)
+        ->parameters(['winkels' => 'store'])
+        ->names('stores')
+        ->except('show');
+});

@@ -45,7 +45,7 @@
     text-decoration: none;
 }
 
-.stores-filter a:first-child,
+.stores-filter a.is-active,
 .stores-filter a:hover {
     background: #111;
     color: #fff;
@@ -105,38 +105,83 @@
 .store-card__image--eten img { object-position: 85% center; }
 .store-card__image--diensten img { object-position: 35% center; }
 
+/* Geüploade foto of logo: past in het bestaande kaartvlak zonder bij te snijden. */
+.store-card__image--photo img {
+    background: #e6e7e8;
+    display: block;
+    height: 100%;
+    object-fit: contain;
+    width: 100%;
+}
+
+.store-card__meta {
+    margin-top: 0.3rem !important;
+}
+
+.store-card__label {
+    color: #1d1d1b;
+}
+
+.stores-empty {
+    background: #e6e7e8;
+    padding: 2.5rem 1rem;
+    text-align: center;
+}
+
+.stores-empty p {
+    color: #4a4d4d;
+    font-size: 0.75rem;
+    margin: 0 0 0.75rem;
+}
+
+.stores-empty a {
+    color: #1d1d1b;
+    font-size: 0.7rem;
+}
+
+/* Kaarttekst van de CMS-winkels: leesbare maten (minimaal ca. 12 px). */
 .store-card__body {
-    padding: 0.4375rem 0.5625rem 0.525rem;
+    padding: 0.8rem 0.95rem 1rem;
 }
 
 .store-card__body > span {
-    color: #777d7c;
-    font-size: 0.525rem;
+    color: #5f6564;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
 }
 
 .store-card h3 {
     font-family: Georgia, 'Times New Roman', serif;
-    font-size: 0.8rem;
+    font-size: 1.25rem;
     font-weight: 400;
-    margin: 0.25rem 0 0.375rem;
+    line-height: 1.2;
+    margin: 0.3rem 0 0.45rem;
 }
 
 .store-card p {
-    color: #626a69;
-    font-size: 0.525rem;
+    color: #4f5655;
+    font-size: 0.9rem;
+    line-height: 1.45;
     margin: 0;
 }
 
 .store-card__body a {
     color: #1e2525;
     display: inline-block;
-    font-size: 0.575rem;
-    margin-top: 0.6875rem;
-    text-decoration: none;
+    font-size: 0.9rem;
+    margin-top: 0.7rem;
+    padding: 0.15rem 0;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
 }
 
-.store-card__body a:hover { text-decoration: underline; }
+.store-card__body a:hover { text-decoration-thickness: 2px; }
+
+.store-card__body a:focus-visible {
+    outline: 2px solid #1d1d1b;
+    outline-offset: 3px;
+}
 
 .store-card__body a span { margin-left: 0.3125rem; }
 
@@ -150,6 +195,7 @@
 
     .stores-filter {
         gap: 1.5625rem;
+        justify-content: flex-start; /* anders valt de eerste knop links buiten beeld bij scrollen */
         padding-left: 1.875rem;
         padding-right: 1.875rem;
     }
