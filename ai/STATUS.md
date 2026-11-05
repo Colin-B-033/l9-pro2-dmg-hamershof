@@ -20,23 +20,40 @@ Eerste werkende CMS-onderdeel: **winkelbeheer**, gekoppeld aan de openbare pagin
 - **Zoeken in het beheer** op winkelnaam via `?zoek=...`: hoofdletterongevoelig (`whereLike`, gebonden parameter), vindt ook verborgen winkels, met een melding en "Toon alle winkels" bij geen resultaten.
 - De beheertabel toont per winkel "Zichtbaar"/"Verborgen" en "Uitgelicht".
 
+### Toegevoegd in de derde stap (5 november 2026)
+
+- **Eén foto of logo per winkel** (`stores.image_path`): optionele upload in het winkelformulier, alleen JPG/PNG/WebP tot 2 MB, op inhoud gecontroleerd aan de serverkant (`mimes`; SVG geweigerd). Laravel geeft het bestand een willekeurige naam in `storage/app/public/stores/`. In de database staat alleen het pad; `image_path` staat niet in `$fillable` en kan dus niet via het formulier worden meegestuurd.
+  - Bij bewerken: huidige afbeelding zichtbaar, vervangen of "Afbeelding verwijderen". Een nieuwe upload gaat voor op verwijderen.
+  - Bij een validatiefout blijft de oude afbeelding staan. Na succesvol vervangen of verwijderen, en bij het verwijderen van de winkel, wordt alleen het oude bestand van die winkel verwijderd (nooit iets buiten de map `stores/`).
+  - Getoond op de winkelkaart (`/winkels`) en bij uitgelichte winkels op de homepage, in het bestaande kaartvlak (`object-fit: contain`). Zonder afbeelding of bij een ontbrekend bestand: de bestaande fallback (beginletter op `/winkels`, video op de homepage).
+- **Openingstijden** (`stores.opening_hours`, tekst tot 255 tekens): in het formulier en als gewone tekst op de winkelkaart; leeg = niets tonen.
+- **Tellers** boven het winkeloverzicht: totaal, zichtbaar, verborgen. Ze tellen altijd alle winkels, ook tijdens zoeken.
+- **Leesbaardere winkelkaarten** op `/winkels`: kaarttekst van ±7 px naar 14–20 px, link onderstreept met zichtbare focusrand. Alleen de `.store-card`-regels in `stores.css` zijn aangepast.
+
+### Opslag lokaal
+
+- Uploads staan op de `public`-disk: `storage/app/public/stores/`. Die map en `public/storage` staan in `.gitignore`, dus uploads gaan niet mee in git.
+- De website leest ze via `public/storage`. Eenmalig per checkout aanmaken: `php artisan storage:link`. Op Windows maakt Laravel daarvoor een directory-junction (`mklink /J`); daarvoor zijn geen beheerrechten of andere Windows-instellingen nodig.
+- `APP_URL` in `.env` moet het adres zijn waarop je de site opent (hier `http://127.0.0.1:8123`), anders kloppen de afbeeldingsadressen niet.
+
 ## Belangrijkste bestanden
 
 | Bestand | Functie |
 | --- | --- |
 | `routes/web.php` | Homepage (`/` en `/home`, met uitgelichte winkels), `/winkels`, beheerroutes onder `/admin` |
 | `routes/console.php` | Commando `admin:create` voor een beheeraccount |
-| `app/Http/Controllers/Admin/StoreController.php` | CRUD, zoeken en validatie voor winkels |
+| `app/Http/Controllers/Admin/StoreController.php` | CRUD, zoeken, tellers, upload/vervangen/verwijderen van de afbeelding, validatie |
 | `app/Http/Middleware/EnsureUserIsAdmin.php` | Beheercontrole (alias `admin` in `bootstrap/app.php`) |
-| `app/Models/Store.php` | Winkelmodel, categorielijst, casts en scope `visible()` |
+| `app/Models/Store.php` | Winkelmodel, categorielijst, casts, scope `visible()`, `imageUrl()` |
 | `database/migrations/2026_11_04_*` | `is_admin` op users, tabel `stores` |
 | `database/migrations/2026_11_05_000001_*` | `is_visible` en `is_featured` op `stores` |
+| `database/migrations/2026_11_05_000002_*` | `image_path` en `opening_hours` op `stores` |
 | `database/seeders/StoreSeeder.php` | 8 voorbeeldwinkels, waarvan 3 uitgelicht (herhaalbaar, overschrijft bestaande winkels niet) |
-| `resources/views/admin/*` | Beheerlayout, overzicht met zoeken, formulier met checkboxes |
+| `resources/views/admin/*` | Beheerlayout, overzicht met tellers en zoeken, formulier met checkboxes, upload en openingstijden |
 | `resources/css/admin.css` | Stijl van het beheer (eigen Vite-entry) |
-| `resources/views/stores.blade.php` | Openbare winkelpagina |
-| `resources/views/home.blade.php` + `resources/css/home.css` | Blok "Uitgelichte Winkels" uit de database (nette indeling bij 1 of 2 kaarten) |
-| `tests/Feature/StoreManagementTest.php` | Featuretests voor winkelbeheer, zichtbaarheid, uitlichten en zoeken |
+| `resources/views/stores.blade.php` + `resources/css/stores.css` | Openbare winkelpagina en winkelkaart (afbeelding, openingstijden, leesbare tekst) |
+| `resources/views/home.blade.php` + `resources/css/home.css` | Blok "Uitgelichte Winkels" uit de database (met afbeelding; nette indeling bij 1 of 2 kaarten) |
+| `tests/Feature/StoreManagementTest.php` | Featuretests voor winkelbeheer, zichtbaarheid, uitlichten, zoeken, afbeeldingen, openingstijden en tellers |
 
 ## Lokaal starten en demonstreren
 
@@ -50,6 +67,7 @@ php artisan key:generate
 touch database/database.sqlite
 php artisan migrate
 php artisan db:seed --class=StoreSeeder
+php artisan storage:link    # maakt public/storage voor de winkelafbeeldingen
 npm run build
 ```
 
@@ -64,6 +82,12 @@ Demo zichtbaarheid en uitlichten:
 2. Open `/` en vernieuw: de winkel staat onder "Uitgelichte Winkels" (maximaal drie, alfabetisch).
 3. Bewerk dezelfde winkel opnieuw → vink **Zichtbaar op de website** uit → opslaan. In de tabel staat "Verborgen".
 4. Vernieuw `/` en `/winkels`: de winkel is weg. In het beheer staat hij er nog; zoek bijvoorbeeld op een deel van de naam.
+
+Demo afbeelding en openingstijden:
+
+1. Beheer → **Bewerken** bij een winkel → kies bij **Foto of logo** een JPG, PNG of WebP (max. 2 MB) en vul **Openingstijden** in, bijv. "Ma–vr 09:00–18:00, za 09:00–17:00" → opslaan.
+2. Vernieuw `/winkels`: de kaart toont de afbeelding en de openingstijden. Is de winkel uitgelicht, dan staat de afbeelding ook op `/`.
+3. Probeer een ander bestandstype (bijv. een SVG of een hernoemd tekstbestand): je krijgt een foutmelding en de oude afbeelding blijft staan.
 
 ## Beheeraccount aanmaken
 
@@ -98,13 +122,31 @@ Bestaat het e-mailadres al, dan krijgt dat account alleen beheerrechten (wachtwo
 - Schermafbeeldingen (headless Chrome, desktop en 500px breed) van de homepage met twee kaarten, het zoekresultaat, het overzicht en het formulier met validatiefout.
 - Beperking: headless Chrome speelt de video in de kaarten onder de vouw niet af (ook niet bij de bestaande evenementkaarten), dus die zijn in de schermafbeeldingen grijs.
 
+## Uitgevoerde controles (derde stap, 5 november 2026)
+
+- `php artisan test --filter=StoreManagementTest`: 33 geslaagd (13 nieuw). Volledige suite: 69 geslaagd, 7 overgeslagen (dezelfde Jetstream-API-tests). `npm run build` en `pint --test` slagen.
+  - Tests gebruiken `Storage::fake('public')` en de in-memory testdatabase.
+  - Gevonden tijdens het testen: `UploadedFile::fake()` bepaalt het type op basis van de bestandsnaam, waardoor een tekstbestand met de naam `nep.jpg` door de test kwam. Echte uploads worden op inhoud gecontroleerd. De tests gebruiken daarom echte tijdelijke bestanden (GD is niet geïnstalleerd, dus geen `fake()->image()`).
+- Nieuwe migratie heen en terug getest op een losse database. `php artisan storage:link` uitgevoerd (junction `public/storage`).
+- Via HTTP op de lokale server, met het bestaande beheeraccount en een tijdelijke winkel "TIJDELIJK Testwinkel (controle)" (daarna via het CMS verwijderd; uploadmap weer leeg; de 8 bestaande winkels ongewijzigd):
+  - toevoegen met PNG → gegenereerde bestandsnaam, bereikbaar via `/storage/...`, zichtbaar op `/winkels`, `/` en `/home`;
+  - bewerken zonder upload houdt de afbeelding; een hernoemd tekstbestand en een bestand van 3 MB geven een Nederlandse foutmelding en de oude afbeelding blijft;
+  - vervangen, nieuwe upload + "verwijderen" tegelijk, expliciet verwijderen en winkel verwijderen ruimen alleen het eigen oude bestand op;
+  - verbergen en weer zichtbaar maken op `/`, `/home`, `/winkels` en het categoriefilter; tellers 9/8/1, ook tijdens zoeken.
+- Schermafbeeldingen (headless Chrome) van de winkelpagina (desktop, 500 px en 390 px), de homepage met uitgelichte afbeelding, het overzicht met tellers en het bewerkformulier met foutmelding.
+- Toetsenbord (Chrome DevTools-protocol, echte Tab/Enter/spatie): op 390 px geen horizontale overloop en kaarttekst 14,4 px; link in de winkelkaart bereikbaar met zichtbare focusrand; inloggen alleen met het toetsenbord; uploadveld en "Afbeelding verwijderen" bereikbaar en met de spatiebalk te bedienen.
+
 ## Bewust nog niet in deze versie (vervolgwerk)
 
 - Beheer van nieuws, evenementen/agenda, huurpanden en plattegrond.
-- Afbeeldingen/logo uploaden, openingstijden, winkeldetailpagina, categorieën als aparte tabel, paginering in het beheer.
+- Winkeldetailpagina, categorieën als aparte tabel, paginering in het beheer, meerdere afbeeldingen of bijsnijden, gestructureerde openingstijden ("nu open").
+- Uploads groter dan `post_max_size` (8 MB in de huidige `php.ini`) worden al door PHP geweigerd vóór Laravel; dan verschijnt een kale 413-foutpagina in plaats van een nette melding. Bestanden tussen 2 en 8 MB krijgen wel de Nederlandse foutmelding.
+- Een gekozen bestand wordt bij een validatiefout niet onthouden; de beheerder moet het opnieuw kiezen (dat staat in de foutmelding).
+- Bestaande navigatie: de links van het dichte mobiele menu zijn alleen buiten beeld geschoven en blijven onzichtbaar bereikbaar met Tab (ca. 17 extra Tab-stappen). Op de loginpagina staat "Wachtwoord vergeten?" tussen e-mail en wachtwoord in de tabvolgorde.
+- De tekst op de homepagekaarten ("Uitgelichte Winkels") en de filterknoppen en kop op `/winkels` zijn nog klein; in deze stap is alleen de winkelkaart op `/winkels` aangepast.
 - Meerdere rollen (bijv. winkelier die alleen de eigen winkel beheert); nu alleen `is_admin`.
 - Nederlandse vertaling van de Fortify/Jetstream-meldingen (bijv. foutmelding bij inloggen).
 - Openbare pagina's die nog ontbreken: menu en footer linken naar o.a. `/te-huur`, `/plattegrond`, `/nieuws`, `/agenda`, `/markten`, `/hamershofbon`, `/contact`, `/privacy`, `/cookies` (404). `/events` en `/bezoekons` bestaan wel, maar staan niet in het menu.
-- Bestaand ontwerp: zeer kleine tekst op de winkelkaarten (0,42rem), lege `<img src="">` op de homepage, evenementen op de homepage en de categorietellingen ("18 winkels") zijn nog vaste voorbeeldtekst.
+- Bestaand ontwerp: lege `<img src="">` op de homepage, evenementen op de homepage en de categorietellingen ("18 winkels") zijn nog vaste voorbeeldtekst.
 - Volgorde van uitgelichte winkels zelf kiezen (nu alfabetisch), en een waarschuwing in het beheer als meer dan drie winkels zijn uitgelicht.
 - `db.sql` is alleen als inhoudelijke referentie gebruikt, niet geïmporteerd.

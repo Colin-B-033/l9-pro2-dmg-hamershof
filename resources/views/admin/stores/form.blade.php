@@ -11,10 +11,12 @@
     @if ($errors->any())
         <div class="admin-alert admin-alert--error" role="alert">
             <strong>De winkel is niet opgeslagen.</strong> Controleer de gemarkeerde velden.
+            Had je een nieuwe afbeelding gekozen? Selecteer die dan opnieuw; browsers onthouden een gekozen bestand niet.
         </div>
     @endif
 
-    <form class="admin-form" method="POST"
+    {{-- enctype is nodig om een bestand mee te sturen. --}}
+    <form class="admin-form" method="POST" enctype="multipart/form-data"
           action="{{ $store->exists ? route('admin.stores.update', $store) : route('admin.stores.store') }}">
         @csrf
         @if ($store->exists)
@@ -72,6 +74,46 @@
                        @error('phone') aria-invalid="true" aria-describedby="phone-error" @enderror>
                 @error('phone') <p class="admin-error" id="phone-error">{{ $message }}</p> @enderror
             </div>
+        </div>
+
+        <div class="admin-field">
+            <label for="opening_hours">Openingstijden</label>
+            <input type="text" id="opening_hours" name="opening_hours" value="{{ old('opening_hours', $store->opening_hours) }}" maxlength="255"
+                   placeholder="Ma–vr 09:00–18:00, za 09:00–17:00"
+                   @error('opening_hours') aria-invalid="true" aria-describedby="opening_hours-error" @enderror>
+            <p class="admin-hint">Gewone tekst, maximaal 255 tekens. Leeg laten als je niets wilt tonen.</p>
+            @error('opening_hours') <p class="admin-error" id="opening_hours-error">{{ $message }}</p> @enderror
+        </div>
+
+        <div class="admin-field">
+            <label for="image">Foto of logo</label>
+
+            @if ($store->imageUrl())
+                <figure class="admin-image-preview">
+                    <img src="{{ $store->imageUrl() }}" alt="Huidige afbeelding van {{ $store->name }}">
+                    <figcaption>Huidige afbeelding</figcaption>
+                </figure>
+            @elseif ($store->image_path)
+                <p class="admin-hint">Het afbeeldingsbestand van deze winkel ontbreekt. Upload een nieuwe afbeelding.</p>
+            @endif
+
+            <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+                   aria-describedby="image-hint @error('image') image-error @enderror"
+                   @error('image') aria-invalid="true" @enderror>
+            <p class="admin-hint" id="image-hint">
+                JPG, PNG of WebP, maximaal 2 MB.
+                @if ($store->image_path) Een nieuw bestand vervangt de huidige afbeelding. @endif
+            </p>
+            @error('image') <p class="admin-error" id="image-error">{{ $message }}</p> @enderror
+
+            @if ($store->image_path)
+                <div class="admin-checkbox">
+                    <input type="hidden" name="remove_image" value="0">
+                    <input type="checkbox" id="remove_image" name="remove_image" value="1" @checked(old('remove_image'))>
+                    <label for="remove_image">Afbeelding verwijderen</label>
+                </div>
+                <p class="admin-hint">Kies je ook een nieuw bestand, dan wordt het nieuwe bestand gebruikt.</p>
+            @endif
         </div>
 
         {{-- Het verborgen veld zorgt dat een uitgevinkte checkbox als "0" wordt verstuurd. --}}

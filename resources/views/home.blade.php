@@ -139,7 +139,14 @@
 						@foreach ($featuredStores as $store)
 							{{-- Bestaande kaartstijlen per positie: 1e, 2e en 3e kaart. --}}
 							<article class="place-card place-card--{{ ['fashion', 'cafe', 'restaurant'][$loop->index] }}">
-								<div class="place-card__image"><video autoplay muted loop playsinline aria-hidden="true"><source src="{{ Vite::asset('resources/assets/Home.mp4') }}" type="video/mp4"></video></div>
+								{{-- Eigen afbeelding van de winkel; zonder afbeelding de bestaande video. --}}
+								<div class="place-card__image">
+									@if ($store->imageUrl())
+										<img src="{{ $store->imageUrl() }}" alt="" loading="lazy">
+									@else
+										<video autoplay muted loop playsinline aria-hidden="true"><source src="{{ Vite::asset('resources/assets/Home.mp4') }}" type="video/mp4"></video>
+									@endif
+								</div>
 								<div class="place-card__body">
 									<span class="place-card__tag">{{ $store->categoryLabel() }}</span>
 									<h3>{{ $store->name }}</h3>

@@ -133,8 +133,21 @@
     font-style: italic;
 }
 
+/* Geüploade foto of logo: past in het bestaande kaartvlak zonder bij te snijden. */
+.store-card__image--photo img {
+    background: #e6e7e8;
+    display: block;
+    height: 100%;
+    object-fit: contain;
+    width: 100%;
+}
+
 .store-card__meta {
-    margin-top: 0.2rem !important;
+    margin-top: 0.3rem !important;
+}
+
+.store-card__label {
+    color: #1d1d1b;
 }
 
 .stores-empty {
@@ -154,38 +167,49 @@
     font-size: 0.7rem;
 }
 
+/* Kaarttekst: leesbare maten (was 0,42–0,64rem). */
 .store-card__body {
-    padding: 0.35rem 0.45rem 0.42rem;
+    padding: 0.8rem 0.95rem 1rem;
 }
 
 .store-card__body > span {
-    color: #777d7c;
-    font-size: 0.42rem;
+    color: #5f6564;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
 }
 
 .store-card h3 {
     font-family: Georgia, 'Times New Roman', serif;
-    font-size: 0.64rem;
+    font-size: 1.25rem;
     font-weight: 400;
-    margin: 0.2rem 0 0.3rem;
+    line-height: 1.2;
+    margin: 0.3rem 0 0.45rem;
 }
 
 .store-card p {
-    color: #626a69;
-    font-size: 0.42rem;
+    color: #4f5655;
+    font-size: 0.9rem;
+    line-height: 1.45;
     margin: 0;
 }
 
 .store-card__body a {
     color: #1e2525;
     display: inline-block;
-    font-size: 0.46rem;
-    margin-top: 0.55rem;
-    text-decoration: none;
+    font-size: 0.9rem;
+    margin-top: 0.7rem;
+    padding: 0.15rem 0;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
 }
 
-.store-card__body a:hover { text-decoration: underline; }
+.store-card__body a:hover { text-decoration-thickness: 2px; }
+
+.store-card__body a:focus-visible {
+    outline: 2px solid #1d1d1b;
+    outline-offset: 3px;
+}
 
 .store-card__body a span { margin-left: 0.25rem; }
 

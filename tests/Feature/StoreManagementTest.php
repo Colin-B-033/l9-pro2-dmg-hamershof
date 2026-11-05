@@ -5,6 +5,8 @@ namespace Tests\Feature;
 use App\Models\Store;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 /**
@@ -21,6 +23,58 @@ class StoreManagementTest extends TestCase
 
         // De tests hebben geen gebouwde frontend (public/build) nodig.
         $this->withoutVite();
+
+        // Nep-opslag: uploads in de tests komen nooit in de echte storage-map.
+        Storage::fake('public');
+    }
+
+    /** Tijdelijke bestanden die in tearDown() weer worden opgeruimd. */
+    private array $tempFiles = [];
+
+    protected function tearDown(): void
+    {
+        array_map('unlink', array_filter($this->tempFiles, 'is_file'));
+
+        parent::tearDown();
+    }
+
+    /**
+     * Maakt een upload van een echt tijdelijk bestand met de opgegeven inhoud.
+     * Let op: UploadedFile::fake() leidt het type af van de bestandsnaam. Een echte upload
+     * wordt op inhoud gecontroleerd, en dat willen we hier ook testen.
+     */
+    private function upload(string $name, string $content): UploadedFile
+    {
+        $path = tempnam(sys_get_temp_dir(), 'winkel-test-');
+        file_put_contents($path, $content);
+        $this->tempFiles[] = $path;
+
+        return new UploadedFile($path, $name, null, null, true);
+    }
+
+    /** Een echte (piepkleine) PNG; desgewenst groter gemaakt met extra bytes. */
+    private function pngUpload(string $name = 'winkel.png', int $extraBytes = 0): UploadedFile
+    {
+        $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==');
+
+        return $this->upload($name, $png.str_repeat("\0", $extraBytes));
+    }
+
+    private function webpUpload(string $name = 'logo.webp'): UploadedFile
+    {
+        return $this->upload($name, base64_decode('UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA=='));
+    }
+
+    /**
+     * Maakt via het CMS een winkel met afbeelding en geeft de winkel terug.
+     */
+    private function createStoreWithImage(array $overrides = []): Store
+    {
+        $this->actingAs($this->admin())
+            ->post('/admin/winkels', $this->validData(['image' => $this->pngUpload()] + $overrides))
+            ->assertSessionHasNoErrors();
+
+        return Store::latest('id')->firstOrFail();
     }
 
     private function admin(): User
@@ -311,5 +365,237 @@ class StoreManagementTest extends TestCase
 
         // Een rare zoekparameter (array) geeft geen serverfout.
         $this->actingAs($this->admin())->get('/admin/winkels?zoek[]=x')->assertOk()->assertSee('Albert Heijn');
+    }
+
+    // --- Afbeelding per winkel ---
+
+    public function test_valid_image_is_stored_with_generated_name_and_shown_publicly(): void
+    {
+        $store = $this->createStoreWithImage(['is_featured' => '1']);
+
+        $this->assertStringStartsWith('stores/', $store->image_path);
+        $this->assertStringNotContainsString('winkel.png', $store->image_path); // gegenereerde naam
+        Storage::disk('public')->assertExists($store->image_path);
+
+        $this->get('/winkels')->assertOk()->assertSee($store->image_path);
+        $this->get('/')->assertOk()->assertSee($store->image_path);
+        $this->actingAs($this->admin())->get("/admin/winkels/{$store->id}/edit")->assertSee($store->image_path);
+    }
+
+    public function test_jpg_and_webp_are_accepted(): void
+    {
+        $jpg = $this->upload('foto.jpg', base64_decode('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////////////////////////////////////////////////////////////////////////////////////wgALCAABAAEBAREA/8QAFBABAAAAAAAAAAAAAAAAAAAAAP/aAAgBAQABPxA='));
+
+        foreach (['Foto Winkel' => $jpg, 'Logo Winkel' => $this->webpUpload()] as $name => $file) {
+            $this->actingAs($this->admin())
+                ->post('/admin/winkels', $this->validData(['name' => $name, 'image' => $file]))
+                ->assertSessionHasNoErrors();
+
+            Storage::disk('public')->assertExists(Store::where('name', $name)->value('image_path'));
+        }
+    }
+
+    public function test_invalid_svg_and_too_large_files_are_rejected(): void
+    {
+        $wrongType = 'Kies een afbeelding van het type JPG, PNG of WebP.';
+
+        $cases = [
+            // Tekstbestand met een afbeeldingsnaam: de inhoud telt, niet de naam.
+            [$this->upload('nep.jpg', 'dit is geen afbeelding'), $wrongType],
+            // SVG kan scripts bevatten en is daarom niet toegestaan.
+            [$this->upload('logo.svg', '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>'), $wrongType],
+            // Een echte PNG, maar net groter dan 2 MB.
+            [$this->pngUpload('groot.png', 2 * 1024 * 1024), 'De afbeelding mag maximaal 2 MB groot zijn.'],
+        ];
+
+        foreach ($cases as [$file, $expectedMessage]) {
+            $this->actingAs($this->admin())
+                ->post('/admin/winkels', $this->validData(['image' => $file]))
+                ->assertSessionHasErrors(['image' => $expectedMessage]);
+        }
+
+        $this->assertDatabaseCount('stores', 0);
+        $this->assertSame([], Storage::disk('public')->allFiles());
+    }
+
+    public function test_validation_error_keeps_the_existing_image(): void
+    {
+        $store = $this->createStoreWithImage();
+        $oldPath = $store->image_path;
+
+        // Ander veld ongeldig, met een geldige nieuwe upload erbij.
+        $this->actingAs($this->admin())
+            ->put("/admin/winkels/{$store->id}", $this->validData(['name' => '', 'image' => $this->pngUpload('nieuw.png')]))
+            ->assertSessionHasErrors('name');
+
+        // Ongeldige upload, met "afbeelding verwijderen" aangevinkt.
+        $this->actingAs($this->admin())
+            ->put("/admin/winkels/{$store->id}", $this->validData([
+                'image' => $this->upload('logo.svg', '<svg xmlns="http://www.w3.org/2000/svg"></svg>'),
+                'remove_image' => '1',
+            ]))
+            ->assertSessionHasErrors('image');
+
+        $this->assertSame($oldPath, $store->fresh()->image_path);
+        Storage::disk('public')->assertExists($oldPath);
+        $this->assertCount(1, Storage::disk('public')->allFiles());
+    }
+
+    public function test_replacing_an_image_deletes_only_the_old_file_of_that_store(): void
+    {
+        Storage::disk('public')->put('logo.png', 'gedeeld bestand buiten de winkelmap');
+        $other = $this->createStoreWithImage(['name' => 'Andere Winkel']);
+        $store = $this->createStoreWithImage();
+        $oldPath = $store->image_path;
+
+        $this->actingAs($this->admin())
+            ->put("/admin/winkels/{$store->id}", $this->validData(['image' => $this->webpUpload()]))
+            ->assertSessionHasNoErrors();
+
+        $store->refresh();
+        $this->assertNotSame($oldPath, $store->image_path);
+        Storage::disk('public')->assertMissing($oldPath);
+        Storage::disk('public')->assertExists($store->image_path);
+        Storage::disk('public')->assertExists($other->image_path);
+        Storage::disk('public')->assertExists('logo.png');
+    }
+
+    public function test_removing_an_image_deletes_the_file_and_shows_the_fallback(): void
+    {
+        $store = $this->createStoreWithImage();
+        $oldPath = $store->image_path;
+
+        $this->actingAs($this->admin())
+            ->put("/admin/winkels/{$store->id}", $this->validData(['remove_image' => '1']))
+            ->assertSessionHasNoErrors();
+
+        $this->assertNull($store->fresh()->image_path);
+        Storage::disk('public')->assertMissing($oldPath);
+        $this->get('/winkels')->assertOk()->assertSee('store-card__image--fallback', false)->assertDontSee($oldPath);
+    }
+
+    public function test_new_upload_wins_over_remove_image(): void
+    {
+        $store = $this->createStoreWithImage();
+        $oldPath = $store->image_path;
+
+        $this->actingAs($this->admin())
+            ->put("/admin/winkels/{$store->id}", $this->validData(['image' => $this->webpUpload(), 'remove_image' => '1']))
+            ->assertSessionHasNoErrors();
+
+        $store->refresh();
+        $this->assertNotNull($store->image_path);
+        Storage::disk('public')->assertExists($store->image_path);
+        Storage::disk('public')->assertMissing($oldPath);
+    }
+
+    public function test_deleting_a_store_deletes_only_its_own_image(): void
+    {
+        $other = $this->createStoreWithImage(['name' => 'Andere Winkel']);
+        $store = $this->createStoreWithImage();
+
+        $this->actingAs($this->admin())->delete("/admin/winkels/{$store->id}")->assertRedirect('/admin/winkels');
+
+        Storage::disk('public')->assertMissing($store->image_path);
+        Storage::disk('public')->assertExists($other->image_path);
+    }
+
+    public function test_image_path_cannot_be_sent_from_the_form(): void
+    {
+        Storage::disk('public')->put('logo.png', 'gedeeld bestand');
+
+        $this->actingAs($this->admin())->post('/admin/winkels', $this->validData(['image_path' => 'logo.png']));
+        $store = Store::firstOrFail();
+        $this->assertNull($store->image_path);
+
+        // Ook bij wijzigen en verwijderen wordt een meegestuurd pad genegeerd.
+        $this->actingAs($this->admin())->put("/admin/winkels/{$store->id}", $this->validData(['image_path' => 'logo.png', 'remove_image' => '1']));
+        $this->actingAs($this->admin())->delete("/admin/winkels/{$store->id}");
+        Storage::disk('public')->assertExists('logo.png');
+    }
+
+    public function test_store_without_image_or_with_missing_file_shows_fallback(): void
+    {
+        Store::create($this->validData(['name' => 'Zonder Afbeelding', 'is_featured' => '1']));
+        $missing = Store::create($this->validData(['name' => 'Kwijt Bestand', 'is_featured' => '1']));
+        $missing->forceFill(['image_path' => 'stores/bestaat-niet.png'])->save();
+
+        $this->get('/winkels')
+            ->assertOk()
+            ->assertSee('Zonder Afbeelding')
+            ->assertSee('Kwijt Bestand')
+            ->assertDontSee('bestaat-niet.png')
+            ->assertDontSee('store-card__image--photo', false);
+
+        $this->get('/')->assertOk()->assertSee('Kwijt Bestand')->assertDontSee('bestaat-niet.png');
+
+        $this->actingAs($this->admin())->get("/admin/winkels/{$missing->id}/edit")
+            ->assertOk()
+            ->assertSee('Het afbeeldingsbestand van deze winkel ontbreekt.');
+    }
+
+    // --- Openingstijden ---
+
+    public function test_opening_hours_are_saved_shown_safely_and_can_be_cleared(): void
+    {
+        $this->actingAs($this->admin())
+            ->post('/admin/winkels', $this->validData(['opening_hours' => 'Ma–vr 09:00–18:00, za 09:00–17:00']))
+            ->assertSessionHasNoErrors();
+        $store = Store::firstOrFail();
+
+        $this->get('/winkels')->assertSee('Openingstijden:')->assertSee('Ma–vr 09:00–18:00, za 09:00–17:00');
+
+        // Tekst wordt veilig weergegeven, niet als HTML.
+        $this->actingAs($this->admin())->put("/admin/winkels/{$store->id}", $this->validData(['opening_hours' => '<b>Altijd</b> open']));
+        $this->get('/winkels')->assertDontSee('<b>Altijd</b>', false)->assertSee('&lt;b&gt;Altijd&lt;/b&gt; open', false);
+
+        // Te lang wordt geweigerd.
+        $this->actingAs($this->admin())
+            ->put("/admin/winkels/{$store->id}", $this->validData(['opening_hours' => str_repeat('a', 256)]))
+            ->assertSessionHasErrors('opening_hours');
+
+        // Leegmaken: daarna wordt er niets getoond.
+        $this->actingAs($this->admin())->put("/admin/winkels/{$store->id}", $this->validData(['opening_hours' => '']));
+        $this->assertNull($store->fresh()->opening_hours);
+        $this->get('/winkels')->assertDontSee('Openingstijden:');
+    }
+
+    // --- Tellers in het beheer ---
+
+    public function test_counters_describe_all_stores_and_do_not_change_when_searching(): void
+    {
+        Store::create($this->validData(['name' => 'Albert Heijn']));
+        Store::create($this->validData(['name' => 'Bakker Bart']));
+        Store::create($this->validData(['name' => 'Verborgen Boetiek', 'is_visible' => '0']));
+
+        $counts = ['<dt>Totaal</dt><dd>3</dd>', '<dt>Zichtbaar</dt><dd>2</dd>', '<dt>Verborgen</dt><dd>1</dd>'];
+
+        foreach (['/admin/winkels', '/admin/winkels?zoek=albert', '/admin/winkels?zoek=xyz'] as $url) {
+            $this->actingAs($this->admin())->get($url)->assertOk()->assertSeeInOrder($counts, false);
+        }
+
+        // Het aantal zoekresultaten staat er apart onder.
+        $this->actingAs($this->admin())->get('/admin/winkels?zoek=albert')->assertSee('1 winkel gevonden voor');
+    }
+
+    // --- Uploads alleen voor beheerders ---
+
+    public function test_guests_and_regular_users_cannot_upload_or_change_images(): void
+    {
+        $store = $this->createStoreWithImage();
+        $path = $store->image_path;
+        $user = User::factory()->create();
+
+        auth()->logout();
+        $this->post('/admin/winkels', $this->validData(['name' => 'Gast', 'image' => $this->pngUpload()]))->assertRedirect('/login');
+
+        $this->actingAs($user)->post('/admin/winkels', $this->validData(['name' => 'Gebruiker', 'image' => $this->pngUpload()]))->assertForbidden();
+        $this->actingAs($user)->put("/admin/winkels/{$store->id}", $this->validData(['image' => $this->webpUpload()]))->assertForbidden();
+        $this->actingAs($user)->put("/admin/winkels/{$store->id}", $this->validData(['remove_image' => '1']))->assertForbidden();
+        $this->actingAs($user)->delete("/admin/winkels/{$store->id}")->assertForbidden();
+
+        $this->assertDatabaseCount('stores', 1);
+        $this->assertSame($path, $store->fresh()->image_path);
+        $this->assertSame([$path], Storage::disk('public')->allFiles());
     }
 }

@@ -323,6 +323,15 @@
     width: 100%;
 }
 
+/* Geüploade foto of logo van een uitgelichte winkel: niet bijsnijden. */
+.place-card__image img {
+    background: #e6e7e8;
+    display: block;
+    height: 100%;
+    object-fit: contain;
+    width: 100%;
+}
+
 .place-card--fashion video { object-position: 15% center; }
 .place-card--cafe video { object-position: 50% center; }
 .place-card--restaurant video { object-position: 85% center; }

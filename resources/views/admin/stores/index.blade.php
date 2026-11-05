@@ -11,6 +11,13 @@
         <a class="admin-button" href="{{ route('admin.stores.create') }}">Winkel toevoegen</a>
     </div>
 
+    {{-- Aantallen over alle winkels; die veranderen niet door een zoekopdracht. --}}
+    <dl class="admin-counts" aria-label="Aantallen winkels">
+        <div><dt>Totaal</dt><dd>{{ $totalCount }}</dd></div>
+        <div><dt>Zichtbaar</dt><dd>{{ $visibleCount }}</dd></div>
+        <div><dt>Verborgen</dt><dd>{{ $hiddenCount }}</dd></div>
+    </dl>
+
     {{-- Gewoon GET-formulier: de zoekterm komt in de adresbalk als ?zoek=... --}}
     <form class="admin-search" method="GET" action="{{ route('admin.stores.index') }}" role="search">
         <label for="zoek">Zoek op winkelnaam</label>

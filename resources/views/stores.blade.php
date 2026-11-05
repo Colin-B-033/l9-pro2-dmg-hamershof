@@ -42,10 +42,16 @@
                 <div class="stores-grid">
                     @foreach ($stores as $store)
                         <article class="store-card">
-                            {{-- Nog geen uploadfunctie: nette fallback met de eerste letter van de winkel. --}}
-                            <div class="store-card__image store-card__image--fallback" aria-hidden="true">
-                                <span>{{ mb_strtoupper(mb_substr($store->name, 0, 1)) }}</span>
-                            </div>
+                            {{-- Eigen afbeelding als die er is; anders de fallback met de eerste letter. --}}
+                            @if ($store->imageUrl())
+                                <div class="store-card__image store-card__image--photo">
+                                    <img src="{{ $store->imageUrl() }}" alt="" loading="lazy">
+                                </div>
+                            @else
+                                <div class="store-card__image store-card__image--fallback" aria-hidden="true">
+                                    <span>{{ mb_strtoupper(mb_substr($store->name, 0, 1)) }}</span>
+                                </div>
+                            @endif
                             <div class="store-card__body">
                                 <span>{{ $store->categoryLabel() }}</span>
                                 <h3>{{ $store->name }}</h3>
@@ -54,6 +60,9 @@
                                 @endif
                                 @if ($store->location)
                                     <p class="store-card__meta">{{ $store->location }}</p>
+                                @endif
+                                @if ($store->opening_hours)
+                                    <p class="store-card__meta"><span class="store-card__label">Openingstijden:</span> {{ $store->opening_hours }}</p>
                                 @endif
                                 @if ($store->phone)
                                     <p class="store-card__meta">Tel. {{ $store->phone }}</p>
