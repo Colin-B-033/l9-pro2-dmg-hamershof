@@ -4,10 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Agenda | De Hamershof</title>
+    @vite('resources/css/app.css')
     <link rel="stylesheet" href="{{ asset('css/agenda.css') }}">
     <script src="{{ asset('js/agenda.js') }}" defer></script>
 </head>
-<body class="agenda-page">
+<body class="site-layout agenda-page">
     @include('nav')
     <main class="agenda-main">
         <header class="agenda-intro"><h1>Agenda</h1><p>Ontdek alle activiteiten en evenementen</p></header>
