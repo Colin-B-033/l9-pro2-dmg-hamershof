@@ -183,7 +183,7 @@ body.menu-is-open {
     margin-top: 32px;
     color: var(--ink);
     font-family: 'Bodoni Moda', 'Times New Roman', serif;
-    font-size: 14px;
+    font-size: 20px;
     line-height: 20px;
     text-decoration: none;
 }
