@@ -65,7 +65,34 @@ Eerste werkende CMS-onderdeel: **winkelbeheer**, gekoppeld aan de openbare winke
 - Browser (headless Chrome, echte klik- en toetsgebeurtenissen) met tijdelijke "TIJDELIJK …"-evenementen, daarna verwijderd: juiste dag, drie op één dag, kalender/lijst, zoeken (hoofdletters), geen resultaten, wissen, maandwissel over de jaargrens (dec 2026 → jan 2027 → terug naar dec 2025), lege maand, verbergen en verwijderen na vernieuwen, HTML in tekst niet uitgevoerd, toetsenbord (Tab, Enter, spatie, Escape, focusrand), 390 en 320 px zonder horizontale overloop. Geen JavaScript-fouten.
 - Niet automatisch getest: het CMS in de browser (het wachtwoord van het beheeraccount is niet bekend en is niet gereset; de schrijfacties zijn met featuretests gedekt) en de `confirm()`-pop-up bij verwijderen.
 
-**Vervolgwerk**: `/events` en de evenementenkaarten op de homepage koppelen aan dezelfde `events`-tabel (nu nog vaste voorbeeldgegevens). Verder: alle zichtbare evenementen gaan in één keer mee (bij veel evenementen per maand laden); in de kalender klikken naar details; bestaand menuprobleem: op 320 px steekt het telefoonnummer uit het dichte mobiele menu links in beeld (ook op `/stores`).
+**Vervolgwerk**: ~~`/events` en de homepage koppelen~~ (gedaan, zie hieronder). Verder: alle zichtbare evenementen gaan in één keer mee (bij veel evenementen per maand laden); in de kalender klikken naar details; bestaand menuprobleem: op 320 px steekt het telefoonnummer uit het dichte mobiele menu links in beeld (ook op `/stores`).
+
+### Evenementen op `/events` en de homepage uit het CMS (18 november 2026)
+
+**Wat nu gekoppeld is**: dezelfde `events`-tabel voedt drie openbare plekken. Geen nieuwe tabel, velden of migratie.
+
+| Plek | Welke evenementen | Volgorde |
+| --- | --- | --- |
+| `/agenda` | alle zichtbare, ook oude (maandnavigatie) | datum, begintijd, titel |
+| `/events` | zichtbare van vandaag of later, met zoeken | idem |
+| `/` en `/home` | maximaal drie zichtbare van vandaag of later | idem |
+
+- "Vandaag" volgens Europe/Amsterdam; een evenement van vandaag blijft de hele dag staan. Nieuwe scope `Event::upcoming()`, alleen gebruikt op `/events` en de homepage; `visible()` is niet veranderd.
+- `/events`: bestaande kaarten en standaardfoto, met echte datum (datumblokje + "vrijdag 20 november 2026"), eventuele tijden, locatie en korte omschrijving; lege velden worden weggelaten. Vaste voorbeeldkaarten, "6 evenementen gevonden", "MAART", verzonnen tijden, het label "GRATIS" en de niet-werkende categorieknoppen zijn weg. Zoeken via GET `?zoek=` (hoofdletterongevoelig, `whereLike` met gebonden parameter), zoekterm blijft staan, echt aantal, "Zoekopdracht wissen"; `?zoek[]=...` wordt genegeerd. Lege toestanden: "Geen evenementen gevonden" (met "Toon alle evenementen") en "Nog geen aankomende evenementen" (met link naar de agenda). Kaarttekst iets groter (12–13 px i.p.v. 9–11 px).
+- Homepage: maximaal drie kaarten in de bestaande opmaak (titel, datum, begintijd/tijden, locatie). Eén of twee kaarten worden gecentreerd. Zonder geschikte evenementen verdwijnen kop en kaarten; de knop "Bekijk Alle Evenementen" (→ `/events`) blijft. Geen links naar detailpagina's. Uitgelichte winkels ongewijzigd.
+
+**Gewijzigde bestanden**: `app/Models/Event.php` (scope `upcoming()`, `dateLabel()`, `monthShort()`), `routes/web.php` (`/events` met zoeken, homepage-query), `resources/views/events.blade.php`, `resources/views/home.blade.php` (alleen het evenementenblok), `resources/css/events.css`, `resources/css/home.css` (alleen regels onder `.home-events`; `home.css` wordt op alle pagina's geladen), `tests/Feature/EventManagementTest.php`.
+
+**Demo**: beheer → Agenda → bij een aankomend evenement **Bewerken**, titel of locatie wijzigen → opslaan → vernieuw `/events`, `/` en `/agenda`: overal de nieuwe tekst. Daarna "Zichtbaar in de agenda" uitvinken → op alle drie de plekken weg, in het beheer nog bewerkbaar. Zoek op `/events` bijvoorbeeld op "KOOP".
+
+**Uitgevoerde controles**
+
+- `php artisan test --filter=EventManagementTest`: 37 geslaagd (13 nieuw, met vaste testdatum 18-11-2026 12:00 via `travelTo`, plus een test rond middernacht UTC/Amsterdam). Ter controle de scope tijdelijk expres kapotgemaakt (`>=` → `>`): 3 tests faalden, daarna hersteld. Volledige suite: 108 geslaagd, 7 overgeslagen (Jetstream-API). `npm run build` en `pint --test` slagen.
+- Het eerder gemelde probleem "`vendor/autoload.php` kan niet worden geopend" trad nu niet op; `php artisan test` draaide gewoon vanuit de projectmap.
+- Browser (headless Chrome): op een tijdelijke tweede server (poort 8124) met een **kopie** van de database in de scratchpad, zodat de echte gegevens niet veranderden; daarna gestopt en de kopie verwijderd. Gecontroleerd: homepage met 3, 2, 1 en 0 evenementen (`/` en `/home`), uitgelichte winkels ongemoeid, `/events` met kaarten, zoeken met het toetsenbord (Tab, typen, Enter, "wissen"), geen resultaten, lege toestand, `?zoek[]=test`, HTML in tekst niet uitgevoerd, aanpassen/verbergen zichtbaar na vernieuwen op alle drie de plekken, oude evenementen nog in de agenda, 390 en 320 px zonder horizontale overloop, geen JavaScript-fouten.
+- Niet in de browser getest: het CMS zelf (wachtwoord van het beheeraccount onbekend en niet gereset; aanpassen/verbergen/verwijderen via het CMS zijn met featuretests gedekt).
+
+**Resterend vervolgwerk**: evenementdetailpagina's, categorieën of prijsinformatie (bewust niet gebouwd); paginering op `/events` bij veel evenementen; de kleine tekst op de homepagekaarten (bestaande opmaak, zelfde stijl als de winkelkaarten); zoeken op `/events` behandelt `%` en `_` als jokertekens.
 
 ## Belangrijkste bestanden
 
@@ -178,7 +205,7 @@ Bestaat het e-mailadres al, dan krijgt dat account alleen beheerrechten (wachtwo
 - Meerdere rollen (bijv. winkelier die alleen de eigen winkel beheert); nu alleen `is_admin`.
 - Nederlandse vertaling van de Fortify/Jetstream-meldingen (bijv. foutmelding bij inloggen).
 - Openbare pagina's die nog ontbreken: de footer linkt naar `/nieuws`, `/markten`, `/hamershofbon`, `/contact`, `/privacy` en `/cookies` (404).
-- De plattegrond (`config/map-shops.php`) en `/events` gebruiken nog eigen vaste gegevens, los van het CMS.
-- Bestaand ontwerp: lege `<img src="">` op de homepage, evenementen op de homepage en de categorietellingen ("18 winkels") zijn nog vaste voorbeeldtekst.
+- De plattegrond (`config/map-shops.php`) gebruikt nog eigen vaste gegevens, los van het CMS.
+- Bestaand ontwerp: lege `<img src="">` op de homepage en de categorietellingen ("18 winkels") zijn nog vaste voorbeeldtekst.
 - Volgorde van uitgelichte winkels zelf kiezen (nu alfabetisch), en een waarschuwing in het beheer als meer dan drie winkels zijn uitgelicht.
 - `db.sql` is alleen als inhoudelijke referentie gebruikt, niet geïmporteerd.

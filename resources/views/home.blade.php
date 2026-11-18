@@ -165,13 +165,33 @@
 			</section>
 		</section>
 
-		<section class="home-events" id="events" aria-labelledby="events-title">
-			<div class="home-section-heading home-section-heading--events"><h2 id="events-title">Evenementen</h2><p>Er is altijd iets te beleven bij Hamershof. Bekijk onze aankomende evenementen en markeer uw agenda.</p></div>
-			<div class="events-grid">
-				@foreach ([['12', 'Lente Fashion Show', 'Bekijk de nieuwste lentetrends tijdens onze exclusieve fashion show met lokale modellen.', '14:00 - 17:00', 'Centrale Plaza', 'fashion'], ['18', 'Kinderactiviteiten Dag', 'Een dag vol pret voor de hele familie met workshops, spelletjes en entertainment.', '10:00 - 16:00', 'Bij de fontein', 'kids'], ['25', 'Food Festival', 'Proef heerlijke gerechten van onze restaurants en ontdek nieuwe smaken.', '12:00 - 20:00', 'Food Court', 'food']] as $event)
-					<article class="event-card"><div class="event-card__image event-card__image--{{ $event[5] }}"><img src="{{ Vite::asset('resources/assets/water.png') }}" alt="Hamershof"><time datetime="2026-03-{{ $event[0] }}"><span>MAART</span>{{ $event[0] }}</time></div><div class="event-card__body"><h3>{{ $event[1] }}</h3><p>{{ $event[2] }}</p><small>◷ &nbsp;{{ $event[3] }}</small><small>⌾ &nbsp;{{ $event[4] }}</small></div></article>
-				@endforeach
-			</div>
+		{{-- Aankomende evenementen uit het CMS (maximaal drie). Zonder geschikte evenementen alleen de knop. --}}
+		<section @class(['home-events', 'home-events--empty' => $upcomingEvents->isEmpty()]) id="events" @if ($upcomingEvents->isNotEmpty()) aria-labelledby="events-title" @else aria-label="Evenementen" @endif>
+			@if ($upcomingEvents->isNotEmpty())
+				<div class="home-section-heading home-section-heading--events"><h2 id="events-title">Evenementen</h2><p>Er is altijd iets te beleven bij Hamershof. Bekijk onze aankomende evenementen en markeer uw agenda.</p></div>
+				<div class="events-grid events-grid--{{ $upcomingEvents->count() }}">
+					@foreach ($upcomingEvents as $event)
+						<article class="event-card">
+							<div class="event-card__image">
+								<img src="{{ Vite::asset('resources/assets/water.png') }}" alt="">
+								{{-- Datumblokje; de volledige datum staat ook in de kaarttekst. --}}
+								<time datetime="{{ $event->date->format('Y-m-d') }}" aria-hidden="true"><span>{{ $event->monthShort() }}</span>{{ $event->date->day }}</time>
+							</div>
+							<div class="event-card__body">
+								<h3>{{ $event->title }}</h3>
+								<small><span aria-hidden="true">▦</span> &nbsp;{{ $event->dateLabel() }}</small>
+								@if ($event->start_time)
+									<small><span aria-hidden="true">◷</span> &nbsp;{{ $event->timeLabel() }}</small>
+								@endif
+								@if ($event->location)
+									<small><span aria-hidden="true">⌾</span> &nbsp;{{ $event->location }}</small>
+								@endif
+							</div>
+						</article>
+					@endforeach
+				</div>
+			@endif
+			<a class="home-button" href="{{ route('events') }}">Bekijk Alle Evenementen</a>
 		</section>
 
 	

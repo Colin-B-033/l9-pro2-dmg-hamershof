@@ -60,11 +60,45 @@ class Event extends Model
     }
 
     /**
+     * Alleen evenementen van vandaag of later (vandaag volgens Nederlandse tijd).
+     * Een evenement van vandaag blijft de hele dag staan, ook als het al afgelopen is.
+     * Gebruik: Event::visible()->upcoming()->get() — op /events en de homepage.
+     * Niet gebruiken voor /agenda: daar moeten oude evenementen te vinden blijven.
+     */
+    public function scopeUpcoming($query)
+    {
+        return $query->where('date', '>=', now('Europe/Amsterdam')->toDateString());
+    }
+
+    /**
      * Sorteert op datum en daarna op begintijd (evenementen zonder tijd eerst).
      */
     public function scopeInAgendaOrder($query)
     {
         return $query->orderBy('date')->orderBy('start_time')->orderBy('title');
+    }
+
+    /**
+     * Nederlandse maand- en dagnamen. Zo hangt de weergave niet af van de taalinstelling van de server.
+     */
+    public const MONTHS = [1 => 'januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+
+    public const WEEKDAYS = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
+
+    /**
+     * Volledige datum, bijvoorbeeld "woensdag 18 november 2026".
+     */
+    public function dateLabel(): string
+    {
+        return self::WEEKDAYS[$this->date->dayOfWeek].' '.$this->date->day.' '.self::MONTHS[$this->date->month].' '.$this->date->year;
+    }
+
+    /**
+     * Korte maand voor het datumblokje op een kaart, bijvoorbeeld "NOV".
+     */
+    public function monthShort(): string
+    {
+        return strtoupper(substr(self::MONTHS[$this->date->month], 0, 3));
     }
 
     /**

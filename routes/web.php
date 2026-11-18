@@ -8,7 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Homepage met maximaal drie zichtbare, uitgelichte winkels (alfabetisch).
+// Homepage met maximaal drie zichtbare, uitgelichte winkels (alfabetisch)
+// en maximaal drie aankomende evenementen (zelfde keuze en volgorde als op /events).
 $homePage = function () {
     $featuredStores = Store::visible()
         ->where('is_featured', true)
@@ -16,7 +17,13 @@ $homePage = function () {
         ->limit(3)
         ->get();
 
-    return view('home', ['featuredStores' => $featuredStores]);
+    $upcomingEvents = Event::visible()
+        ->upcoming()
+        ->inAgendaOrder()
+        ->limit(3)
+        ->get();
+
+    return view('home', ['featuredStores' => $featuredStores, 'upcomingEvents' => $upcomingEvents]);
 };
 
 Route::get('/', $homePage)->name('home');
@@ -65,9 +72,21 @@ Route::get('/winkels', function (Request $request) {
     return redirect()->route('stores', is_string($category) ? ['categorie' => $category] : [], 301);
 });
 
-Route::get('/events', function () {
-    return view('events');
-});
+// Openbare evenementenpagina: zichtbare evenementen van vandaag of later, met zoeken via ?zoek=...
+Route::get('/events', function (Request $request) {
+    // Alleen een gewone tekst gebruiken; iets als ?zoek[]=test wordt genegeerd.
+    $search = $request->query('zoek');
+    $search = is_string($search) ? trim($search) : '';
+
+    $events = Event::visible()
+        ->upcoming()
+        // whereLike zoekt standaard hoofdletterongevoelig en gebruikt een gebonden parameter.
+        ->when($search !== '', fn ($query) => $query->whereLike('title', "%{$search}%"))
+        ->inAgendaOrder()
+        ->get();
+
+    return view('events', ['events' => $events, 'search' => $search]);
+})->name('events');
 
 Route::get('/bezoekons', function () {
     return view('bezoekons');

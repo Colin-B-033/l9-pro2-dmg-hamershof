@@ -15,47 +15,64 @@
 		</header>
 
 		<section class="events-content" aria-labelledby="events-title">
-			<label class="events-search">
-				<span aria-hidden="true">⌕</span>
-				<input type="search" placeholder="Zoek een evenement..." aria-label="Zoek een evenement">
-			</label>
+			{{-- Gewoon GET-formulier: de zoekterm komt in de adresbalk als ?zoek=... --}}
+			<form class="events-search-form" method="GET" action="{{ route('events') }}" role="search">
+				<label class="events-search">
+					<span aria-hidden="true">⌕</span>
+					<input type="search" name="zoek" value="{{ $search }}" maxlength="100" placeholder="Zoek een evenement..." aria-label="Zoek een evenement op titel">
+				</label>
+				<button type="submit" class="events-search-form__button">Zoeken</button>
+				@if ($search !== '')
+					<a class="events-search-form__clear" href="{{ route('events') }}">Zoekopdracht wissen</a>
+				@endif
+			</form>
 
-			<nav class="events-filters" aria-label="Filter evenementen">
-				<a class="is-active" href="#alle">Alle evenementen</a>
-				<a href="#mode">Mode</a>
-				<a href="#familie">Familie</a>
-				<a href="#cultuur">Cultuur</a>
-				<a href="#muziek">Muziek</a>
-				<a href="#markt">Markt</a>
-				<a href="#wellness">Wellness</a>
-			</nav>
+			@php($count = $events->count())
 
-			<h2 id="events-title">6 evenementen gevonden</h2>
+			@if ($count > 0)
+				<h2 id="events-title">
+					{{ $count }} {{ $count === 1 ? 'evenement' : 'evenementen' }} gevonden
+					@if ($search !== '') voor &ldquo;{{ $search }}&rdquo; @endif
+				</h2>
 
-			<div class="events-grid">
-				@foreach ([
-					['12', 'Lente Fashion Show', 'Bekijk de nieuwste lentetrends tijdens onze exclusieve fashion show met lokale modellen.', '14:00 - 17:00', 'Centrale Plaza', 'fashion'],
-					['18', 'Kinderactiviteiten Dag', 'Een dag vol pret voor de hele familie met workshops, spelletjes en entertainment.', '10:00 - 16:00', 'Bij de fontein', 'family'],
-					['25', 'Food Festival', 'Proef heerlijke gerechten van onze restaurants en ontdek nieuwe smaken.', '12:00 - 20:00', 'Food Court', 'food'],
-					['5', 'Live Muziek-Avond', 'Geniet van live optredens van lokale bands en artiesten.', '18:30 - 22:00', 'Centrale Plaza', 'music'],
-					['10', 'Popsmarkt', 'Speciale aanbiedingen met lokale ambachtslieden en producten.', '10:00 - 17:00', 'Hoofdingang', 'market'],
-					['20', 'Beauty & Wellness Day', 'Een dag gewijd aan schoonheid en welzijn met workshops en behandelingen.', '10:00 - 18:00', 'Eerste verdieping', 'wellness']
-				] as $event)
-					<article class="event-card">
-						<div class="event-card__visual event-card__visual--{{ $event[5] }}">
-							<img src="{{ Vite::asset('resources/assets/oudemensen.png') }}" alt="">
-							<time datetime="2026-03-{{ $event[0] }}"><span>MAART</span>{{ $event[0] }}</time>
-							<b>GRATIS</b>
-						</div>
-						<div class="event-card__body">
-							<h3>{{ $event[1] }}</h3>
-							<p>{{ $event[2] }}</p>
-							<small><span aria-hidden="true">◷</span>{{ $event[3] }}</small>
-							<small><span aria-hidden="true">⌾</span>{{ $event[4] }}</small>
-						</div>
-					</article>
-				@endforeach
-			</div>
+				<div class="events-grid">
+					@foreach ($events as $event)
+						<article class="event-card">
+							{{-- De bestaande beeldstijlen (uitsnede van de standaardfoto) wisselen per kaart. --}}
+							<div class="event-card__visual event-card__visual--{{ ['fashion', 'family', 'food', 'music', 'market', 'wellness'][$loop->index % 6] }}">
+								<img src="{{ Vite::asset('resources/assets/oudemensen.png') }}" alt="">
+								{{-- Datumblokje; de volledige datum staat ook in de kaarttekst. --}}
+								<time datetime="{{ $event->date->format('Y-m-d') }}" aria-hidden="true"><span>{{ $event->monthShort() }}</span>{{ $event->date->day }}</time>
+							</div>
+							<div class="event-card__body">
+								<h3>{{ $event->title }}</h3>
+								@if ($event->description)
+									<p>{{ \Illuminate\Support\Str::limit($event->description, 120) }}</p>
+								@endif
+								<small><span aria-hidden="true">▦</span>{{ $event->dateLabel() }}</small>
+								@if ($event->timeLabel())
+									<small><span aria-hidden="true">◷</span>{{ $event->timeLabel() }}</small>
+								@endif
+								@if ($event->location)
+									<small><span aria-hidden="true">⌾</span>{{ $event->location }}</small>
+								@endif
+							</div>
+						</article>
+					@endforeach
+				</div>
+			@elseif ($search !== '')
+				<div class="events-empty">
+					<h2 id="events-title">Geen evenementen gevonden</h2>
+					<p>Er is geen aankomend evenement met &ldquo;{{ $search }}&rdquo; in de titel.</p>
+					<a class="events-empty__button" href="{{ route('events') }}">Toon alle evenementen</a>
+				</div>
+			@else
+				<div class="events-empty">
+					<h2 id="events-title">Nog geen aankomende evenementen</h2>
+					<p>Er staan op dit moment geen evenementen gepland. Kijk binnenkort nog eens, of bekijk eerdere activiteiten in de agenda.</p>
+					<a class="events-empty__button" href="{{ route('agenda') }}">Naar de agenda</a>
+				</div>
+			@endif
 		</section>
 	</main>
     @include('footer')

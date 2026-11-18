@@ -443,6 +443,23 @@
 .event-card__image--kids video { object-position: 72% center; }
 .event-card__image--food video { object-position: 88% center; }
 
+/* Evenementen op de homepage (uit het CMS): standaardfoto vullend in het kaartvlak. */
+.home-events .event-card__image img {
+    display: block;
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+}
+
+/* Minder dan drie evenementen: kaarten even breed houden en centreren. */
+@media (min-width: 701px) {
+    .home-events .events-grid--1 { grid-template-columns: minmax(0, 20rem); justify-content: center; }
+    .home-events .events-grid--2 { grid-template-columns: repeat(2, minmax(0, 20rem)); justify-content: center; }
+}
+
+/* Geen aankomende evenementen: alleen de knop, zonder grote witruimte erboven. */
+.home-events--empty { padding-top: 2rem; }
+
 .event-card__image time {
     background: #fff;
     color: #20252a;
