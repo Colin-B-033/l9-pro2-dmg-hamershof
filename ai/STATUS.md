@@ -45,6 +45,28 @@ Eerste werkende CMS-onderdeel: **winkelbeheer**, gekoppeld aan de openbare winke
 - `import.meta.glob(['../assets/**'])` in `resources/js/app.js` zorgt dat ook de nieuwe afbeeldingen van `main` in de build zitten (anders geeft `Vite::asset()` een fout na `npm run build`).
 - Gecontroleerd: `php artisan test` (71 geslaagd, 7 overgeslagen), `npm run build`, alle pagina's en media via HTTP, CMS-toevoegen/uploaden/verbergen/vervangen/verwijderen met een tijdelijke testwinkel (daarna verwijderd), schermafbeeldingen van homepage, winkelpagina, menu en beheer.
 
+### Agenda beheerbaar via het CMS (18 november 2026)
+
+**Wat werkt**
+
+- Beheer onder `/admin/evenementen` (menulink "Agenda", achter `auth` + `admin`): overzicht op datum en begintijd (titel, datum, tijd, zichtbaarheid, acties), toevoegen, bewerken, verwijderen met bevestiging, lege toestand, succesmeldingen. Eén gedeeld formulier, zelfde aanpak als winkels.
+- Velden: titel (verplicht, max. 100), datum (verplicht, echte kalenderdatum; oude datums mogen), begintijd, eindtijd (alleen mét begintijd en later dan de begintijd: een evenement valt binnen één dag), locatie (max. 150), omschrijving (max. 1000), zichtbaar in de agenda (standaard aan; uitvinken slaat echt `false` op, keuze blijft bij een validatiefout). Nederlandse foutmeldingen, `old()`.
+- `/agenda` toont alleen zichtbare evenementen, op de juiste dag (ook meerdere per dag). Start in de huidige maand (Europe/Amsterdam), vandaag gemarkeerd. Kalender (titel + begintijd) en lijst (titel, datum, tijden, locatie, omschrijving) delen maand en zoekterm. Zoeken hoofdletterongevoelig op titel binnen de gekozen maand, ook na een maandwissel; meldingen bij een lege maand of geen resultaten; knop "Zoekterm wissen" (of Escape).
+- Gegevenskoppeling: de route geeft de zichtbare evenementen via `@json` (met `JSON_HEX_*`) in `<script type="application/json">` mee; `agenda.js` bouwt alles op met `textContent`. Datums gaan als tekst `Y-m-d` mee en worden niet via `new Date("…")` (UTC) gelezen.
+
+**Belangrijkste bestanden**: `app/Models/Event.php`, `app/Http/Controllers/Admin/EventController.php`, `database/migrations/2026_11_18_000001_create_events_table.php`, `database/seeders/EventSeeder.php` (6 demo-evenementen rond de huidige maand; herhaalbaar, overschrijft niets), `resources/views/admin/events/*`, `routes/web.php` (`/agenda` en beheerroutes), `resources/views/agenda.blade.php`, `public/js/agenda.js`, `public/css/agenda.css`, `tests/Feature/EventManagementTest.php`.
+
+**Demo**: Beheer → Agenda → **Evenement toevoegen** (bijv. vandaag, 14:00–16:00) → `/agenda` vernieuwen: staat op de juiste dag, en met details onder **Lijst** → in het beheer **Bewerken** → "Zichtbaar in de agenda" uitvinken → opslaan ("Verborgen") → `/agenda` vernieuwen: weg, maar in het beheer nog bewerkbaar.
+
+**Uitgevoerde controles**
+
+- Featuretests `EventManagementTest`: 24 geslaagd (toegang gast/gewone gebruiker, toevoegen/bewerken/verwijderen, verplichte velden, ongeldige datums en tijdcombinaties, uitvinken, verborgen maar bewerkbaar, JSON naar de agenda, veilige tekst, seeder). Volledige suite: 95 geslaagd, 7 overgeslagen (Jetstream-API). `npm run build` en `pint --test` slagen.
+- Migratie heen en terug getest op een kopie van de database; daarna alleen `php artisan migrate` op de ontwikkeldatabase (account en 8 winkels ongewijzigd) en `db:seed --class=EventSeeder`.
+- Browser (headless Chrome, echte klik- en toetsgebeurtenissen) met tijdelijke "TIJDELIJK …"-evenementen, daarna verwijderd: juiste dag, drie op één dag, kalender/lijst, zoeken (hoofdletters), geen resultaten, wissen, maandwissel over de jaargrens (dec 2026 → jan 2027 → terug naar dec 2025), lege maand, verbergen en verwijderen na vernieuwen, HTML in tekst niet uitgevoerd, toetsenbord (Tab, Enter, spatie, Escape, focusrand), 390 en 320 px zonder horizontale overloop. Geen JavaScript-fouten.
+- Niet automatisch getest: het CMS in de browser (het wachtwoord van het beheeraccount is niet bekend en is niet gereset; de schrijfacties zijn met featuretests gedekt) en de `confirm()`-pop-up bij verwijderen.
+
+**Vervolgwerk**: `/events` en de evenementenkaarten op de homepage koppelen aan dezelfde `events`-tabel (nu nog vaste voorbeeldgegevens). Verder: alle zichtbare evenementen gaan in één keer mee (bij veel evenementen per maand laden); in de kalender klikken naar details; bestaand menuprobleem: op 320 px steekt het telefoonnummer uit het dichte mobiele menu links in beeld (ook op `/stores`).
+
 ## Belangrijkste bestanden
 
 | Bestand | Functie |
@@ -147,7 +169,7 @@ Bestaat het e-mailadres al, dan krijgt dat account alleen beheerrechten (wachtwo
 
 ## Bewust nog niet in deze versie (vervolgwerk)
 
-- Beheer van nieuws, evenementen/agenda, huurpanden en plattegrond.
+- Beheer van nieuws, huurpanden en plattegrond (de agenda is inmiddels beheerbaar).
 - Winkeldetailpagina, categorieën als aparte tabel, paginering in het beheer, meerdere afbeeldingen of bijsnijden, gestructureerde openingstijden ("nu open").
 - Uploads groter dan `post_max_size` (8 MB in de huidige `php.ini`) worden al door PHP geweigerd vóór Laravel; dan verschijnt een kale 413-foutpagina in plaats van een nette melding. Bestanden tussen 2 en 8 MB krijgen wel de Nederlandse foutmelding.
 - Een gekozen bestand wordt bij een validatiefout niet onthouden; de beheerder moet het opnieuw kiezen (dat staat in de foutmelding).
@@ -156,7 +178,7 @@ Bestaat het e-mailadres al, dan krijgt dat account alleen beheerrechten (wachtwo
 - Meerdere rollen (bijv. winkelier die alleen de eigen winkel beheert); nu alleen `is_admin`.
 - Nederlandse vertaling van de Fortify/Jetstream-meldingen (bijv. foutmelding bij inloggen).
 - Openbare pagina's die nog ontbreken: de footer linkt naar `/nieuws`, `/markten`, `/hamershofbon`, `/contact`, `/privacy` en `/cookies` (404).
-- De plattegrond (`config/map-shops.php`) en de agenda gebruiken nog eigen vaste gegevens, los van het CMS.
+- De plattegrond (`config/map-shops.php`) en `/events` gebruiken nog eigen vaste gegevens, los van het CMS.
 - Bestaand ontwerp: lege `<img src="">` op de homepage, evenementen op de homepage en de categorietellingen ("18 winkels") zijn nog vaste voorbeeldtekst.
 - Volgorde van uitgelichte winkels zelf kiezen (nu alfabetisch), en een waarschuwing in het beheer als meer dan drie winkels zijn uitgelicht.
 - `db.sql` is alleen als inhoudelijke referentie gebruikt, niet geïmporteerd.

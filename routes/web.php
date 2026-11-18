@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\EventController;
 use App\Http\Controllers\Admin\StoreController;
+use App\Models\Event;
 use App\Models\Store;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -79,9 +81,15 @@ Route::get('/plattegrond', function () {
     return view('plattegrond', ['shops' => config('map-shops')]);
 });
 
+// Openbare agenda: de zichtbare evenementen uit het CMS gaan als JSON mee naar public/js/agenda.js.
 Route::get('/agenda', function () {
-    return view('agenda');
-});
+    $events = Event::visible()
+        ->inAgendaOrder()
+        ->get()
+        ->map(fn (Event $event) => $event->toAgendaArray());
+
+    return view('agenda', ['events' => $events]);
+})->name('agenda');
 
 // CMS: alleen voor ingelogde beheerders (is_admin = true).
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -90,5 +98,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('winkels', StoreController::class)
         ->parameters(['winkels' => 'store'])
         ->names('stores')
+        ->except('show');
+
+    Route::resource('evenementen', EventController::class)
+        ->parameters(['evenementen' => 'event'])
+        ->names('events')
         ->except('show');
 });

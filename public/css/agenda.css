@@ -35,13 +35,31 @@
 .weekdays, .calendar-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
 .weekdays { border-bottom: 1px solid #c8cac7; background: #f5f5f5; color: #4a4d4d; font-size: 11px; font-weight: 700; text-align: center; }
 .weekdays span { padding: 6px 0; }
-.calendar-day { min-height: 60px; padding: 7px 9px; border-right: 1px solid #e6e6e3; border-bottom: 1px solid #e6e6e3; color: #4a4d4d; font-size: 12px; }
+.calendar-day { min-width: 0; min-height: 60px; padding: 7px 9px; border-right: 1px solid #e6e6e3; border-bottom: 1px solid #e6e6e3; color: #4a4d4d; font-size: 12px; }
 .calendar-day:nth-child(7n) { border-right: 0; }
 .calendar-day.outside { background: #f5f5f5; }
 .calendar-day time { display: block; }
+.calendar-day.today time { display: inline-block; min-width: 22px; padding: 0 4px; background: #111; color: #fff; font-weight: 700; text-align: center; }
 
-.agenda-page #list-view { padding: 80px 20px; color: #6b7074; font-size: 15px; text-align: center; }
-.agenda-page #search-status { flex: 0 0 100%; margin: 0; color: #6b7074; font-size: 13px; }
+/* Evenementen in de kalender: titel en eventuele begintijd. Lange titels worden na 3 regels afgekort. */
+.calendar-events { margin: 4px 0 0; padding: 0; list-style: none; }
+.calendar-event { display: -webkit-box; margin-top: 3px; padding: 2px 4px; overflow: hidden; border-left: 3px solid #111; background: #f1f1ef; color: #111; font-size: 12px; line-height: 1.3; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.calendar-event__time { font-weight: 700; }
+
+/* Melding bij zoeken of een lege maand, met knop om de zoekterm te wissen */
+.agenda-status { display: flex; flex: 0 0 100%; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.agenda-page #search-status { margin: 0; color: #4a4d4d; font-size: 14px; }
+.agenda-clear { min-height: 36px; padding: 6px 12px; border: 1px solid #111; background: #fff; color: #111; font-size: 13px; }
+
+/* Lijstweergave: alle informatie van een evenement */
+.agenda-empty { margin: 0; padding: 80px 20px; color: #6b7074; font-size: 15px; text-align: center; }
+.agenda-list { margin: 0; padding: 0; list-style: none; }
+.agenda-item { padding: 18px 20px; border-bottom: 1px solid #e6e6e3; overflow-wrap: anywhere; }
+.agenda-item:last-child { border-bottom: 0; }
+.agenda-item h3 { margin: 0 0 4px; font: 400 22px/1.25 Georgia, 'Times New Roman', serif; }
+.agenda-item__when { margin: 0; color: #4a4d4d; font-size: 14px; font-weight: 700; }
+.agenda-item__location { margin: 4px 0 0; color: #4a4d4d; font-size: 14px; }
+.agenda-item__description { margin: 8px 0 0; font-size: 15px; line-height: 1.5; white-space: pre-line; }
 
 @media (max-width: 700px) {
     .agenda-main { margin: 20px auto 40px; padding: 0 16px; }
@@ -51,6 +69,11 @@
     .month-bar h2 { font-size: 26px; }
     .month-bar small { font-size: 13px; }
     .month-bar button { flex: none; width: 40px; }
-    .calendar-day { min-height: 52px; padding: 6px; font-size: 11px; }
+    /* Smalle kolommen: kleinere marge en de volledige titel (niet afkappen), zodat alles leesbaar blijft. */
+    .calendar-day { min-height: 52px; padding: 4px 3px; font-size: 11px; }
+    .calendar-event { display: block; padding: 2px 3px; border-left-width: 2px; font-size: 11px; hyphens: auto; }
+    .calendar-event__time { display: block; }
+    .agenda-item { padding: 16px; }
+    .agenda-item h3 { font-size: 20px; }
     .weekdays { font-size: 10px; }
 }

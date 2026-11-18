@@ -15,6 +15,7 @@
 
         <nav class="admin-nav" aria-label="Beheernavigatie">
             <a href="{{ route('admin.stores.index') }}" @class(['is-active' => request()->routeIs('admin.stores.*')])>Winkels</a>
+            <a href="{{ route('admin.events.index') }}" @class(['is-active' => request()->routeIs('admin.events.*')])>Agenda</a>
             <a href="{{ route('home') }}" target="_blank" rel="noopener">Bekijk website <span aria-hidden="true">&#8599;</span></a>
         </nav>
 
